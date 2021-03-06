@@ -1,16 +1,5 @@
 #include <stdio.h>
 
-typedef char const* (*PTRFUN) ();
-
-struct Animal {
-    char* name;
-    struct Animal_methods* methods;
-};
-struct Animal_methods {
-    PTRFUN greet;
-    PTRFUN menu;
-};
-
 char const* dogGreet(void) {
     return "vau!";
 }
@@ -23,6 +12,21 @@ char const* catGreet(void) {
 char const* catMenu(void) {
     return "konzerviranu tunjevinu";
 }
+
+typedef char const* (*PTRFUN) ();
+
+struct Animal_methods {
+    PTRFUN greet;
+    PTRFUN menu;
+};
+struct Animal {
+    char const* name;
+    struct Animal_methods* methods;
+};
+
+struct Animal_methods dogMethods = { &dogGreet, &dogMenu };
+struct Animal_methods catMethods = { &catGreet, &catMenu };
+
 void animalPrintGreeting(struct Animal* animal) {
     printf("%s pozdravlja: %s\n", animal->name, animal->methods->greet());
 }
@@ -31,15 +35,11 @@ void animalPrintMenu(struct Animal* animal) {
 }
 void constructDog(struct Animal* animal, char const* name) {
     animal->name = name;
-    animal->methods = malloc(sizeof (struct Animal_methods));
-    animal->methods->greet = &dogGreet;
-    animal->methods->menu = &dogMenu;
+    animal->methods = &dogMethods;
 }
 void constructCat(struct Animal* animal, char const* name) {
     animal->name = name;
-    animal->methods = malloc(sizeof (struct Animal_methods));
-    animal->methods->greet = &catGreet;
-    animal->methods->menu = &catMenu;
+    animal->methods = &catMethods;
 }
 struct Animal* createDog(char const* name) {
     struct Animal* animal = malloc(sizeof (struct Animal));
@@ -65,7 +65,9 @@ void testAnimals(void) {
     animalPrintMenu(p2);
     animalPrintMenu(p3);
 
-    free(p1); free(p2); free(p3);
+    free(p1); 
+    free(p2); 
+    free(p3);
 }
 
 int main(void) {
