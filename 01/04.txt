@@ -1,0 +1,49 @@
+
+Svi odgovori vezani uz datoteku 04.demangled.s
+
+1. Pronađite dijelove assemblerskog kôda u kojima se odvija alociranje memorije za objekte poc i *pb.
+
+U potprogramu main (linija 135).
+Alociranje memorije za poc: drugi push između linija 137 i 151.
+
+Alociranje memorije za *pb: prvo se u main-u pozove konstruktor CoolClass-a na liniji
+154, zatim se u potprogramu konstruktora prvom naredbom push (linija 110) alocira memorija.
+
+
+2. Objasnite razliku u načinu alociranja tih objekata.
+
+Kod alociranja objekta PlainClass nema poziva konstruktora dok kod
+alociranja objekta CoolClass postoji poziv konstruktora.
+
+
+3. Pronađite dio assemblerskog kôda koji je zadužen za poziv konstruktora objekta poc, ako takav poziv postoji.
+
+Ne posotji takav poziv.
+
+
+4. Pronađite dio assemblerskog kôda koji je zadužen za poziv konstruktora objekta *pb. Razmotrite kako se točno izvršava taj kôd. 
+Što se u njemu događa?
+
+U potprogramu main linija 154.
+Prvo se ulazi u konstruktor CoolClass-a u kojem se poziva konstruktor Base-a.
+U konstruktoru Base klase se postavlja virtualna tablica Base klase te se vraća u konstruktor CoolClass-a.
+Nakon toga se postavlja virtualna tablica CoolClass-a, te se potom izlazi iz konsturkora CoolClass-a 
+u potprogram main.
+
+
+5. Promotrite kako je prevoditelj izveo pozive pb->set i poc.set. Objasnite razliku između izvedbi tih dvaju poziva. 
+Koji od ta dva poziva zahtijeva manje instrukcija? Za koju od te dvije izvedbe bi optimirajući prevoditelj mogao 
+generirati kôd bez instrukcije CALL odnosno izravno umetnuti implementaciju funkcije (eng. inlining)?
+
+poc.set linije 157-159
+pb->set linije 160-166
+
+Kod poc.set prije poziva potprograma samo je pripremljena vrijednost 42 koju treba postaviti
+dok je kod pb->set prije poziva potprograma bilo potrebno dohvatiti virtualnu tablicu,
+zatim iz virtualne tablice dohvaća potrebnu metodu, tek onda se priprema vrijednost 42 pa se 
+napokom može pozvati potprogram set.
+
+6. Pronađite asemblerski kôd za definiciju i inicijalizaciju tablice virtualnih funkcija razreda CoolClass.
+
+Definicija: linije 185-194
+Inicijalizacija: Linija 120
