@@ -3,7 +3,7 @@
         {
             "type": "cppbuild",
             "label": "C/C++: gcc build active file",
-            "command": "/usr/bin/g++",
+            "command": "/usr/bin/gcc",
             "args": [
                 "-g",
                 "${file}",
@@ -14,7 +14,7 @@
                 "cwd": "${workspaceFolder}"
             },
             "problemMatcher": [
-                "$g++"
+                "$gcc"
             ],
             "group": {
                 "kind": "build",

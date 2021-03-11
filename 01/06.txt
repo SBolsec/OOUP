@@ -1,0 +1,25 @@
+Opis prati datoteku 06-demangled.s
+
+Ispis programa je:
+Metoda kaze: ja sam bazna implementacija!
+Metoda kaze: ja sam izvedena implementacija!
+Metoda kaze: ja sam izvedena implementacija!
+
+Prvo se pozove konstruktor klase Derived koji poyove konstruktor klase Base (linija 112). 
+Kada se uđe u konstruktor klase Base, on na liniji 19 postavi svoju virtualnu tablicu, te 
+nakon toga pozove funkciju Base::metoda (linija 24). Ta funkcija preko virtualne tablice
+dohvaća funkciju virtualnaMetoda koju treba dohvatiti, u ovom slučaju poziva funkciju Base::virtualnaMetoda
+zato jer je objekt trenutno kao virtualnu tablicu ima virtualnu tablicu razreda Base.
+Zbog ovoga je prvi redak ispisa: "Metoda kaze: ja sam bazna implementacija!".
+
+Nakon što je gotov konstruktor Base klase, vraća se u konstruktor Derived klase.
+Sada se kao virtualna tablica postavlja virtualna tabica klase Derived (linija 113).
+Nakon toga poziva se funkcija Base::metoda (linija 118). Ta funkcija preko virtualne tablice
+dohvaća funkciju virtualnaMetoda koju treba dohvatiti, u ovom slučaju poziva funkciju Derived::virtualnaMetoda
+zato jer je objekt trenutno kao virtualnu tablicu ima virtualnu tablicu razreda Derived.
+Zbog ovoga je drugi redak ispisa: "Metoda kaze: ja sam izvedena implementacija!".
+
+Nakon što je objekt stvoren, sljedeća linija programskog koda poziva funkciju metoda nad tim objektom.
+Objekt sada kao virtualnu tablicu ima postavljenu virtualnu tablicu raazreda Derived te se
+slijed radnji odvija isto kao u prethodnom opisu.
+Zbog ovoga je treći redak ispisa: "Metoda kaze: ja sam izvedena implementacija!".
