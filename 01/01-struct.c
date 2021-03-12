@@ -20,22 +20,28 @@ char const *catMenu(void)
 
 typedef char const *(*PTRFUN)();
 
+typedef struct
+{
+    PTRFUN greet;
+    PTRFUN menu;
+} Vtable;
+
 struct Animal
 {
     char const *name;
-    PTRFUN *methods;
+    Vtable *methods;
 };
 
-PTRFUN dogMethods[2] = {&dogGreet, &dogMenu};
-PTRFUN catMethods[2] = {&catGreet, &catMenu};
+Vtable dogMethods = {&dogGreet, &dogMenu};
+Vtable catMethods = {&catGreet, &catMenu};
 
 void animalPrintGreeting(struct Animal *animal)
 {
-    printf("%s pozdravlja: %s\n", animal->name, animal->methods[0]());
+    printf("%s pozdravlja: %s\n", animal->name, animal->methods->greet());
 }
 void animalPrintMenu(struct Animal *animal)
 {
-    printf("%s voli %s\n", animal->name, animal->methods[1]());
+    printf("%s voli %s\n", animal->name, animal->methods->menu());
 }
 void constructDog(struct Animal *animal, char const *name)
 {

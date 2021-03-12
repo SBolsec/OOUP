@@ -14,11 +14,12 @@ public:
     virtual int druga(int x) { return prva() + x; }
 };
 
-typedef int (*PFUN1)(B*);
-typedef int (*PFUN2)(B*, int);
+typedef int (*PFUN1)(B *);
+typedef int (*PFUN2)(B *, int);
 
-void function(B *pb) {
-    void** vptr = *(void***)pb;
+void function(B *pb)
+{
+    void **vptr = *(void ***)pb;
 
     PFUN1 f1 = (PFUN1)vptr[0];
     PFUN2 f2 = (PFUN2)vptr[1];
@@ -27,7 +28,8 @@ void function(B *pb) {
     std::cout << "Druga: " << f2(pb, 10) << std::endl;
 }
 
-int main() {
+int main()
+{
     B *pb = new D();
     function(pb);
     return 0;
