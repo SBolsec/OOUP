@@ -11,7 +11,6 @@ typedef struct {
 } Unary_Function;
 
 typedef double (*PTRDOUBLE) (Unary_Function*, double);
-typedef bool (*PTRBOOL) (Unary_Function*, Unary_Function*, double);
 
 double negative_value_at(Unary_Function* fn, double x) {
     PTRDOUBLE function = (PTRDOUBLE) fn->vtf[0];
@@ -40,8 +39,7 @@ bool same_functions_for_ints(Unary_Function *f1, Unary_Function *f2, double tole
 
 PTRVOID Unary_Function_vtable[] = {
     (PTRDOUBLE) NULL, // value_at
-    (PTRDOUBLE) &negative_value_at,
-    (PTRVOID) &tabulate
+    (PTRDOUBLE) &negative_value_at
 };
 
 Unary_Function* createUnaryFunction(int lb, int ub) {
@@ -64,8 +62,7 @@ double Square_value_at(Square* fn, double x) {
 
 PTRVOID Square_vtable[] = {
     (PTRDOUBLE) &Square_value_at,
-    (PTRDOUBLE) &negative_value_at,
-    (PTRVOID) &tabulate
+    (PTRDOUBLE) &negative_value_at
 };
 
 Square* createSquare(int lb, int ub) {
@@ -90,8 +87,7 @@ double Linear_value_at(Linear* fn, double x) {
 
 PTRVOID Linear_vtable[] = {
     (PTRDOUBLE) &Linear_value_at,
-    (PTRDOUBLE) &negative_value_at,
-    (PTRVOID) &tabulate
+    (PTRDOUBLE) &negative_value_at
 };
 
 Linear* createLinear(int lb, int ub, double a_coef, double b_coef) {
@@ -106,9 +102,9 @@ Linear* createLinear(int lb, int ub, double a_coef, double b_coef) {
 
 int main(void) {
     Unary_Function *f1 = (Unary_Function *) createSquare(-2, 2);
-    f1->vtf[2](f1);
+    tabulate(f1);
     Unary_Function *f2 = (Unary_Function *) createLinear(-2, 2, 5, -2);
-    f2->vtf[2](f2);
+    tabulate(f2);
 
     printf("f1==f2: %s\n", same_functions_for_ints(f1, f2, 1E-6) ? "DA" : "NE");
     PTRDOUBLE neg_val = (PTRDOUBLE) f2->vtf[1];
