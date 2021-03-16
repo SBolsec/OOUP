@@ -4,10 +4,11 @@ Svi odgovori vezani uz datoteku 04.demangled.s
 1. Pronađite dijelove assemblerskog kôda u kojima se odvija alociranje memorije za objekte poc i *pb.
 
 U potprogramu main (linija 135).
-Alociranje memorije za poc: drugi push između linija 137 i 151.
+Alociranje memorije za poc: linija 145, mijenja se vrijednost kazala stoga, ostvlja se mjesto za objekt
 
 Alociranje memorije za *pb: prvo se u main-u pozove konstruktor CoolClass-a na liniji
-154, zatim se u potprogramu konstruktora prvom naredbom push (linija 110) alocira memorija.
+154, zatim se u potprogramu konstruktora memorija alocira naredbom na liniji 115 kojom se
+kazalo stoga pomiče i ostalja se mjesto za objekt.
 
 
 2. Objasnite razliku u načinu alociranja tih objekata.
@@ -25,7 +26,7 @@ Ne posotji takav poziv.
 Što se u njemu događa?
 
 U potprogramu main linija 154.
-Prvo se ulazi u konstruktor CoolClass-a u kojem se poziva konstruktor Base-a.
+Prvo se ulazi u konstruktor CoolClass-a u kojem se alocira memorija te se poziva konstruktor Base-a.
 U konstruktoru Base klase se postavlja virtualna tablica Base klase te se vraća u konstruktor CoolClass-a.
 Nakon toga se postavlja virtualna tablica CoolClass-a, te se potom izlazi iz konsturkora CoolClass-a 
 u potprogram main.

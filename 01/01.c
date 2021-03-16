@@ -26,8 +26,8 @@ struct Animal
     PTRFUN *methods;
 };
 
-PTRFUN dogMethods[2] = {&dogGreet, &dogMenu};
-PTRFUN catMethods[2] = {&catGreet, &catMenu};
+PTRFUN dogMethods[] = {&dogGreet, &dogMenu};
+PTRFUN catMethods[] = {&catGreet, &catMenu};
 
 void animalPrintGreeting(struct Animal *animal)
 {
@@ -60,6 +60,27 @@ struct Animal *createCat(char const *name)
     return cat;
 }
 
+void testAnimals(void)
+{
+    struct Animal *p1 = createDog("Hamlet");
+    struct Animal *p2 = createCat("Ofelija");
+    struct Animal *p3 = createDog("Polonije");
+
+    animalPrintGreeting(p1);
+    animalPrintGreeting(p2);
+    animalPrintGreeting(p3);
+
+    animalPrintMenu(p1);
+    animalPrintMenu(p2);
+    animalPrintMenu(p3);
+
+    free(p1);
+    free(p2);
+    free(p3);
+}
+
+// Helper function for creating dog names
+// Turns integer into a character array
 char *toArray(int number)
 {
     int n = 0;
@@ -71,32 +92,33 @@ char *toArray(int number)
     }
     if (number == 0)
         n = 1;
-    char *numberArray = calloc(n + 1, sizeof(char));
-    for (int i = n - 1; i >= 0; --i, number /= 10)
+    char *numberArray = calloc(4 + n + 1, sizeof(char));
+    numberArray[0] = 'D';
+    numberArray[1] = 'o';
+    numberArray[2] = 'g';
+    numberArray[3] = ' ';
+    for (int i = 4 + n - 1; i >= 4; --i, number /= 10)
     {
         numberArray[i] = (number % 10) + '0';
     }
-    numberArray[n] = '\0';
+    numberArray[4+ n] = '\0';
     return numberArray;
 }
 
-struct Animal *createNDogs(int n)
+// Function to create n dogs by using one malloc call
+void createNDogs(int n)
 {
+    // alocate the memory for the dogs
     struct Animal *dogs = malloc(n * sizeof(struct Animal));
 
+    // initialize the dogs
     for (int i = 0; i < n; i++)
     {
-        char *c = toArray(i);
+        char *c = toArray(i+1);
         dogs[i] = *(createDog(c));
     }
 
-    return dogs;
-}
-
-void testAnimals(void)
-{
-    int n = 250;
-    struct Animal *dogs = createNDogs(n);
+    // test if it's working
     for (int i = 0; i < n; i++)
     {
         animalPrintGreeting(&dogs[i]);
@@ -104,8 +126,36 @@ void testAnimals(void)
     }
 }
 
+void createOnStack() {
+    // create and initialize animals on stack
+    struct Animal p1;
+    p1.name = "Achiles";
+    p1.methods = dogMethods;
+    struct Animal p2;
+    p2.name = "Persephone";
+    p2.methods = catMethods;
+    struct Animal p3;
+    p3.name = "Theseus";
+    p3.methods = dogMethods;
+
+    // test if it's working
+    animalPrintGreeting(&p1);
+    animalPrintGreeting(&p2);
+    animalPrintGreeting(&p3);
+
+    animalPrintMenu(&p1);
+    animalPrintMenu(&p2);
+    animalPrintMenu(&p3);
+}
+
 int main(void)
 {
     testAnimals();
+
+    printf("\n=== Create animals on stack: ===\n");
+    createOnStack();
+
+    printf("\n=== Creating n(5) dogs: ===\n");
+    createNDogs(5);
     return 0;
 }

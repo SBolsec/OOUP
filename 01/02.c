@@ -2,16 +2,16 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-typedef void const *(*PTRVOID)();
+typedef void (*PTRFUN)(void);
 
 typedef struct
 {
-    PTRVOID *vtf;
+    PTRFUN *vtf;
     int lower_bound;
     int upper_bound;
 } Unary_Function;
 
-typedef double (*PTRDOUBLE)(Unary_Function *, double);
+typedef double (*PTRDOUBLE)();
 
 double negative_value_at(Unary_Function *fn, double x)
 {
@@ -34,8 +34,10 @@ bool same_functions_for_ints(Unary_Function *f1, Unary_Function *f2, double tole
         return false;
     if (f1->upper_bound != f2->upper_bound)
         return false;
+
     PTRDOUBLE func1 = (PTRDOUBLE)f1->vtf[0];
     PTRDOUBLE func2 = (PTRDOUBLE)f2->vtf[0];
+
     for (int x = f1->lower_bound; x <= f1->upper_bound; x++)
     {
         double delta = func1(f1, (double)x) - func2(f2, (double)x);
@@ -47,9 +49,9 @@ bool same_functions_for_ints(Unary_Function *f1, Unary_Function *f2, double tole
     return true;
 }
 
-PTRVOID Unary_Function_vtable[] = {
-    (PTRDOUBLE)NULL, // value_at
-    (PTRDOUBLE)&negative_value_at};
+PTRFUN Unary_Function_vtable[] = {
+    NULL, // value_at
+    (PTRDOUBLE) &negative_value_at};
 
 Unary_Function *createUnaryFunction(int lb, int ub)
 {
@@ -62,7 +64,7 @@ Unary_Function *createUnaryFunction(int lb, int ub)
 
 typedef struct
 {
-    PTRVOID *vtf;
+    PTRFUN *vtf;
     int lower_bound;
     int upper_bound;
 } Square;
@@ -72,7 +74,7 @@ double Square_value_at(Square *fn, double x)
     return x * x;
 }
 
-PTRVOID Square_vtable[] = {
+PTRFUN Square_vtable[] = {
     (PTRDOUBLE)&Square_value_at,
     (PTRDOUBLE)&negative_value_at};
 
@@ -87,7 +89,7 @@ Square *createSquare(int lb, int ub)
 
 typedef struct
 {
-    PTRVOID *vtf;
+    PTRFUN *vtf;
     int lower_bound;
     int upper_bound;
     double a;
@@ -99,7 +101,7 @@ double Linear_value_at(Linear *fn, double x)
     return fn->a * x + fn->b;
 }
 
-PTRVOID Linear_vtable[] = {
+PTRFUN Linear_vtable[] = {
     (PTRDOUBLE)&Linear_value_at,
     (PTRDOUBLE)&negative_value_at};
 
