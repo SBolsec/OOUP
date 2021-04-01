@@ -8,7 +8,7 @@ const void *mymax(const void *base, size_t nmeb, size_t size, int (*compar)(cons
     for (size_t i = 1; i < nmeb; ++i)
     {
         const void *current = ((const char *)base) + (i*size);
-        if (compar(current, max) == 1) 
+        if (compar(current, max)) 
         {
             max = current;
         }
