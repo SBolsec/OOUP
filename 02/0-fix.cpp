@@ -94,11 +94,11 @@ void moveShapes(const std::list<Shape *> &fig, Point *translation)
 int main()
 {
     std::list<Shape *> shapes;
-    shapes.push_back(new Circle);
-    shapes.push_back(new Square);
-    shapes.push_back(new Square);
-    shapes.push_back(new Circle);
-    shapes.push_back(new Rhomb);
+    shapes.push_back(new Circle());
+    shapes.push_back(new Square());
+    shapes.push_back(new Square());
+    shapes.push_back(new Circle());
+    shapes.push_back(new Rhomb());
 
     drawShapes(shapes);
 
