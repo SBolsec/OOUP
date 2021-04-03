@@ -163,24 +163,20 @@ public:
             return (double)this->numbers.back();
         }
         // is there a percent rank equal to P?
+        int k = -1; // index used to calculate the required value
         std::vector<double>::iterator it = percent_rank.begin();
-        for (size_t i = 0; it != percent_rank.end(); it++)
+        for (size_t i = 0; it != percent_rank.end(); it++, i++)
         {
             if (percentile == *it.base())
             {
                 return (double)this->numbers.at(i);
             }
-        }
-        // else calculate the value
-        int k = -1;
-        for (size_t i = 0; i < percent_rank.size(); i++)
-        {
-            if (percent_rank.at(i) > percentile)
+            if (k == -1 && *it.base() > percentile)
             {
-                k = i - 1;
-                break;
+                k = i - 1; // store the first occurance
             }
         }
+        // else calculate the value
         return (double)(this->numbers.at(k) + n * (percentile - percent_rank.at(k)) * (this->numbers.at(k + 1) - this->numbers.at(k)) / 100);
     }
 };
@@ -210,8 +206,7 @@ public:
         percentile->setNumbers(numbers);
         for (int i = 10; i <= 90; i += 10)
         {
-            double res = percentile->calculate(i);
-            std::cout << i << ". percentile: " << res << std::endl;
+            std::cout << i << ". percentile: " << percentile->calculate(i) << std::endl;
         }
     }
 };
