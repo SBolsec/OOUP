@@ -70,8 +70,7 @@ public:
         for (int i = 0; i < this->n; i++)
         {
             // get random number with normal distribution using gen as random source
-            float sample = nd(gen);
-            result.push_back((int)sample);
+            result.push_back((int) nd(gen));
         }
         return result;
     }
@@ -134,7 +133,8 @@ public:
 class LinearInterpolationPercentile : public Percentile
 {
 public:
-    virtual void setNumbers(std::vector<int> numbers) {
+    virtual void setNumbers(std::vector<int> numbers)
+    {
         this->numbers = numbers;
         sort(this->numbers.begin(), this->numbers.end());
     }
@@ -151,7 +151,6 @@ public:
         }
 
         // find the percentile rank
-
         // is P < P1?
         if (percentile < percent_rank.front())
         {
