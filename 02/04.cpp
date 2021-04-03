@@ -65,13 +65,13 @@ public:
         std::mt19937 gen(rd());
         // instance of class std::normal_distribution with specific mean and stddev
         std::normal_distribution<float> nd(this->mean, this->standard_deviation);
-        
+
         std::vector<int> result;
         for (int i = 0; i < this->n; i++)
         {
             // get random number with normal distribution using gen as random source
             float sample = nd(gen);
-            result.push_back((int) sample);
+            result.push_back((int)sample);
         }
         return result;
     }
@@ -109,13 +109,13 @@ public:
 class Percentile
 {
 public:
-    virtual int calculate(int percentile, std::vector<int> list)=0;
+    virtual double calculate(int percentile, std::vector<int> list) = 0;
 };
 
 class NearestRankPercentile : public Percentile
 {
 public:
-    virtual int calculate(int percentile, std::vector<int> list)
+    virtual double calculate(int percentile, std::vector<int> list)
     {
         // sort the list
         std::vector<int> sorted = list;
@@ -124,7 +124,60 @@ public:
 
         // find and return the required value
         double n_p = percentile * n / 100 + 0.5;
-        return sorted.at((size_t) n_p);
+        return sorted.at((size_t)n_p);
+    }
+};
+
+class LinearInterpolationPercentile : public Percentile
+{
+public:
+    virtual double calculate(int percentile, std::vector<int> list)
+    {
+        // sort the list
+        std::vector<int> sorted = list;
+        sort(sorted.begin(), sorted.end());
+        size_t n = sorted.size();
+
+        // calculate the percent ranks
+        std::vector<double> percent_rank;
+        for (size_t i = 1; i <= n; i++)
+        {
+            double res = 100 * (i - 0.5) / n;
+            percent_rank.push_back(res);
+        }
+
+        // find the percentile rank
+
+        // is P < P1?
+        if (percentile < percent_rank.front())
+        {
+            return (double)sorted.front();
+        }
+        // is P > Pn?
+        if (percentile > percent_rank.back())
+        {
+            return (double)sorted.back();
+        }
+        // is there a percent rank equal to P?
+        std::vector<double>::iterator it = percent_rank.begin();
+        for (size_t i = 0; it != percent_rank.end(); it++)
+        {
+            if (percentile == *it.base())
+            {
+                return (double)sorted.at(i);
+            }
+        }
+        // else calculate the value
+        int k = -1;
+        for (size_t i = 0; i < percent_rank.size(); i++)
+        {
+            if (percent_rank.at(i) > percentile)
+            {
+                k = i - 1;
+                break;
+            }
+        }
+        return (double)(sorted.at(k) + n * (percentile - percent_rank.at(k)) * (sorted.at(k + 1) - sorted.at(k)) / 100);
     }
 };
 
@@ -134,23 +187,26 @@ class DistributionTester
 private:
     NumberGenerator *numberGenerator;
     Percentile *percentile;
+
 public:
     DistributionTester(NumberGenerator *ng, Percentile *p) : numberGenerator{ng}, percentile{p} {}
 
-    void setNumberGenerator(NumberGenerator *numberGenerator) {
+    void setNumberGenerator(NumberGenerator *numberGenerator)
+    {
         this->numberGenerator = numberGenerator;
     }
-    void setPercentile(Percentile *percentile) {
+    void setPercentile(Percentile *percentile)
+    {
         this->percentile = percentile;
     }
 
-    void testDistribution() {
+    void testDistribution()
+    {
         std::vector<int> numbers = numberGenerator->generateNumbers();
-        sort(numbers.begin(), numbers.end());
         for (int i = 10; i <= 90; i += 10)
         {
-            int res = percentile->calculate(i, numbers);
-            std::cout << res << "\n";
+            double res = percentile->calculate(i, numbers);
+            std::cout << i << ". percentile: " << res << std::endl;
         }
     }
 };
@@ -159,13 +215,35 @@ public:
 int main()
 {
     NumberGenerator *fng = new FibonacciNumberGenerator(10);
-    std::vector<int> res1 = fng->generateNumbers();
-    NumberGenerator *sng = new SequentiallNumberGenerator(20, 50, 4);
-    std::vector<int> res2 = sng->generateNumbers();
+    NumberGenerator *sng = new SequentiallNumberGenerator(15, 50, 5);
     NumberGenerator *rng = new RandomNumberGenerator(10, 10, 10);
-    std::vector<int> res3 = rng->generateNumbers();
-    Percentile *p = new NearestRankPercentile();
-    DistributionTester *dt = new DistributionTester(fng, p);
+    Percentile *p1 = new NearestRankPercentile();
+    Percentile *p2 = new LinearInterpolationPercentile();
+
+    DistributionTester *dt = new DistributionTester(sng, p1);
+    std::cout << "== Sequential, nearest ==\n";
+    dt->testDistribution();
+
+    std::cout << "== Sequential, linear interpolation ==\n";
+    dt->setPercentile(p2);
+    dt->testDistribution();
+
+    std::cout << "== Fibonacci, nearest ==\n";
+    dt->setNumberGenerator(fng);
+    dt->setPercentile(p1);
+    dt->testDistribution();
+
+    std::cout << "== Fibonacci, linear interpolation ==\n";
+    dt->setPercentile(p2);
+    dt->testDistribution();
+
+    std::cout << "== Random, nearest ==\n";
+    dt->setNumberGenerator(rng);
+    dt->setPercentile(p1);
+    dt->testDistribution();
+
+    std::cout << "== Random, linear interpolation ==\n";
+    dt->setPercentile(p2);
     dt->testDistribution();
 
     return 0;
