@@ -70,3 +70,13 @@ int main()
 
     return 0;
 }
+
+/*
+Prednosti ove implementacije su što je funkciji mymax potrebno predati manje argumenta,
+umjesto početka, broja elemenata i veličine elementa potrebno je predati samo početni
+i završni element.
+Iduća prednost je što nije potrebno castanje kod funkcija za usporedbu te kod dohvaćanja
+sljedećeg elementa.
+Još jedna prednost je da ovo rješenje omogućava uporabu sa standardnim spremnicima C++-a
+vector i set kao što je demonstirano u programu.
+*/
