@@ -108,35 +108,33 @@ public:
 // Classes for calculating the percentile
 class Percentile
 {
+protected:
+    std::vector<int> numbers;
 public:
-    virtual double calculate(int percentile, std::vector<int> list) = 0;
+    virtual void setNumbers(std::vector<int> numbers) { this->numbers = numbers; }
+    virtual void setNumbersSorted(std::vector<int> numbers) {
+        this->numbers = numbers;
+        sort(this->numbers.begin(), this->numbers.end());
+    }
+    virtual double calculate(int percentile) = 0;
 };
 
 class NearestRankPercentile : public Percentile
 {
 public:
-    virtual double calculate(int percentile, std::vector<int> list)
+    virtual double calculate(int percentile)
     {
-        // sort the list
-        std::vector<int> sorted = list;
-        sort(sorted.begin(), sorted.end());
-        size_t n = sorted.size();
-
-        // find and return the required value
-        double n_p = percentile * n / 100 + 0.5;
-        return sorted.at((size_t)n_p);
+        double n_p = percentile * this->numbers.size() / 100 + 0.5;
+        return this->numbers.at((size_t)n_p);
     }
 };
 
 class LinearInterpolationPercentile : public Percentile
 {
 public:
-    virtual double calculate(int percentile, std::vector<int> list)
+    virtual double calculate(int percentile)
     {
-        // sort the list
-        std::vector<int> sorted = list;
-        sort(sorted.begin(), sorted.end());
-        size_t n = sorted.size();
+        size_t n = this->numbers.size();
 
         // calculate the percent ranks
         std::vector<double> percent_rank;
@@ -151,12 +149,12 @@ public:
         // is P < P1?
         if (percentile < percent_rank.front())
         {
-            return (double)sorted.front();
+            return (double)this->numbers.front();
         }
         // is P > Pn?
         if (percentile > percent_rank.back())
         {
-            return (double)sorted.back();
+            return (double)this->numbers.back();
         }
         // is there a percent rank equal to P?
         std::vector<double>::iterator it = percent_rank.begin();
@@ -164,7 +162,7 @@ public:
         {
             if (percentile == *it.base())
             {
-                return (double)sorted.at(i);
+                return (double)this->numbers.at(i);
             }
         }
         // else calculate the value
@@ -177,7 +175,7 @@ public:
                 break;
             }
         }
-        return (double)(sorted.at(k) + n * (percentile - percent_rank.at(k)) * (sorted.at(k + 1) - sorted.at(k)) / 100);
+        return (double)(this->numbers.at(k) + n * (percentile - percent_rank.at(k)) * (this->numbers.at(k + 1) - this->numbers.at(k)) / 100);
     }
 };
 
@@ -203,9 +201,10 @@ public:
     void testDistribution()
     {
         std::vector<int> numbers = numberGenerator->generateNumbers();
+        percentile->setNumbersSorted(numbers);
         for (int i = 10; i <= 90; i += 10)
         {
-            double res = percentile->calculate(i, numbers);
+            double res = percentile->calculate(i);
             std::cout << i << ". percentile: " << res << std::endl;
         }
     }
