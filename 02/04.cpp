@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include <algorithm>
 
 // Classes for generating the numbers
 class NumberGenerator
@@ -104,11 +105,54 @@ public:
     }
 };
 
+// Classes for calculating the percentile
+class Percentile
+{
+public:
+    virtual int calculate(int percentile, std::vector<int> list)=0;
+};
+
+class NearestRankPercentile : public Percentile
+{
+public:
+    virtual int calculate(int percentile, std::vector<int> list)
+    {
+        // sort the list
+        std::vector<int> sorted = list;
+        sort(sorted.begin(), sorted.end());
+        size_t n = sorted.size();
+
+        // find and return the required value
+        double n_p = percentile * n / 100 + 0.5;
+        return sorted.at((size_t) n_p);
+    }
+};
+
 // Primary class
 class DistributionTester
 {
 private:
     NumberGenerator *numberGenerator;
+    Percentile *percentile;
+public:
+    DistributionTester(NumberGenerator *ng, Percentile *p) : numberGenerator{ng}, percentile{p} {}
+
+    void setNumberGenerator(NumberGenerator *numberGenerator) {
+        this->numberGenerator = numberGenerator;
+    }
+    void setPercentile(Percentile *percentile) {
+        this->percentile = percentile;
+    }
+
+    void testDistribution() {
+        std::vector<int> numbers = numberGenerator->generateNumbers();
+        sort(numbers.begin(), numbers.end());
+        for (int i = 10; i <= 90; i += 10)
+        {
+            int res = percentile->calculate(i, numbers);
+            std::cout << res << "\n";
+        }
+    }
 };
 
 // Starting point
@@ -120,6 +164,9 @@ int main()
     std::vector<int> res2 = sng->generateNumbers();
     NumberGenerator *rng = new RandomNumberGenerator(10, 10, 10);
     std::vector<int> res3 = rng->generateNumbers();
+    Percentile *p = new NearestRankPercentile();
+    DistributionTester *dt = new DistributionTester(fng, p);
+    dt->testDistribution();
 
     return 0;
 }
