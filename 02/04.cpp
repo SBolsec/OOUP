@@ -110,18 +110,20 @@ class Percentile
 {
 protected:
     std::vector<int> numbers;
+
 public:
     virtual void setNumbers(std::vector<int> numbers) { this->numbers = numbers; }
-    virtual void setNumbersSorted(std::vector<int> numbers) {
-        this->numbers = numbers;
-        sort(this->numbers.begin(), this->numbers.end());
-    }
     virtual double calculate(int percentile) = 0;
 };
 
 class NearestRankPercentile : public Percentile
 {
 public:
+    virtual void setNumbers(std::vector<int> numbers)
+    {
+        this->numbers = numbers;
+        sort(this->numbers.begin(), this->numbers.end());
+    }
     virtual double calculate(int percentile)
     {
         double n_p = percentile * this->numbers.size() / 100 + 0.5;
@@ -132,6 +134,10 @@ public:
 class LinearInterpolationPercentile : public Percentile
 {
 public:
+    virtual void setNumbers(std::vector<int> numbers) {
+        this->numbers = numbers;
+        sort(this->numbers.begin(), this->numbers.end());
+    }
     virtual double calculate(int percentile)
     {
         size_t n = this->numbers.size();
@@ -201,7 +207,7 @@ public:
     void testDistribution()
     {
         std::vector<int> numbers = numberGenerator->generateNumbers();
-        percentile->setNumbersSorted(numbers);
+        percentile->setNumbers(numbers);
         for (int i = 10; i <= 90; i += 10)
         {
             double res = percentile->calculate(i);
