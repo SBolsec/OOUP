@@ -36,6 +36,7 @@ private:
 public:
     SlijedBrojeva(IzvorBrojeva *source) : source{source} {}
 
+    void setNumberSource(IzvorBrojeva *source) { this->source = source; }
     std::vector<int> getNumbers() { return this->numbers; }
 
     void attach(Akcija *action)
@@ -277,12 +278,21 @@ public:
 // Starting point
 int main()
 {
-    SlijedBrojeva *slijedBrojeva = new SlijedBrojeva(new DatotecniIzvor("./02/05-brojevi.txt"));
+    IzvorBrojeva *i1 = new DatotecniIzvor("./02/05-brojevi.txt");
+    SlijedBrojeva *slijedBrojeva = new SlijedBrojeva(i1);
     Akcija *a1 = new IspisiSumu(slijedBrojeva);
     Akcija *a2 = new IspisiProsjek(slijedBrojeva);
     Akcija *a3 = new IspisiMedijan(slijedBrojeva);
     Akcija *a4 = new Zapisnik(slijedBrojeva);
     slijedBrojeva->kreni();
 
+    IzvorBrojeva *i2 = new TipkovnickiIzvor();
+    slijedBrojeva->setNumberSource(i2);
+    slijedBrojeva->kreni();
+
+    delete a1; delete a2; delete a3; delete a4;
+    delete i1; delete i2;
+    delete slijedBrojeva;
+    
     return 0;
 }
