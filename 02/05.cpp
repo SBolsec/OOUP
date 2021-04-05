@@ -21,7 +21,8 @@ public:
 
         try
         {
-            return std::stoi(input);
+            int num = std::stoi(input);
+            return num < 0 ? -1 : num;
         }
         catch (const std::exception &e)
         {
@@ -58,7 +59,8 @@ public:
         {
             std::string word;
             file >> word;
-            return std::stoi(word);
+            int num = std::stoi(word);
+            return num < 0 ? -1 : num;
         }
         catch (const std::exception &e)
         {
@@ -85,15 +87,14 @@ public:
 int main()
 {
     IzvorBrojeva *izvor = new DatotecniIzvor("/data/projekti/OOUP/02/05-brojevi.txt");
-    int a1 = izvor->generateNumber();
-    int a2 = izvor->generateNumber();
-    int a3 = izvor->generateNumber();
-    int a4 = izvor->generateNumber();
-    int a5 = izvor->generateNumber();
-    int a6 = izvor->generateNumber();
-    int a7 = izvor->generateNumber();
-    int a8 = izvor->generateNumber();
-    int a9 = izvor->generateNumber();
+    for (int i = 0; i < 9; i++)
+    {
+        std::cout << izvor->generateNumber() << std::endl;
+    }
     delete izvor;
+    IzvorBrojeva *izvor1 = new TipkovnickiIzvor();
+    std::cout << izvor1->generateNumber() << std::endl;
+    std::cout << izvor1->generateNumber() << std::endl;
+    std::cout << izvor1->generateNumber() << std::endl;
     return 0;
 }
