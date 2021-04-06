@@ -125,7 +125,7 @@ public:
     }
     virtual double calculate(int percentile)
     {
-        double n_p = percentile * this->numbers.size() / 100 + 0.5;
+        double n_p = round(percentile * this->numbers.size() / 100.0 + 0.5) - 1;
         return this->numbers.at((size_t)n_p);
     }
 };
@@ -176,7 +176,7 @@ public:
             }
         }
         // else calculate the value
-        return (double)(this->numbers.at(k) + n * (percentile - percent_rank.at(k)) * (this->numbers.at(k + 1) - this->numbers.at(k)) / 100);
+        return this->numbers.at(k) + n * (percentile - percent_rank.at(k)) * (this->numbers.at(k + 1) - this->numbers.at(k)) / 100.0;
     }
 };
 
