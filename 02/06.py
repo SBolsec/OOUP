@@ -10,6 +10,7 @@ class Cell:
     self.exp = exp
     self.set_exp(exp)
 
+
   def set_exp(self, exp):
     # check for circular references and store old refs
     self.__check_circular_reference(exp)
@@ -29,18 +30,23 @@ class Cell:
       cell.attach(self)
     self.notify()
 
+
   def attach(self, observer):
     self.observers.append(observer)
 
+
   def dettach(self, observer):
     self.observers.remove(observer)
+
 
   def notify(self):
     for o in self.observers:
       o.update()
 
+
   def update(self):
     self.value = self.sheet.evaluate(self)
+
 
   def __check_circular_reference(self, exp):
     refs = []
@@ -74,13 +80,16 @@ class Sheet:
     self.width = width
     self.height = height
 
+
   def cell(self, ref):
     index = self.__ref_to_index(ref)
     return self.cells[index[0]][index[1]]
 
+
   def set(self, ref, content):
     cell = self.cell(ref)
     cell.set_exp(content)
+
 
   def getrefs(self, cell):
     refs = list(map(lambda x: x[1], self.__get_ref_with_cell_name(cell)))
@@ -98,15 +107,18 @@ class Sheet:
     except Exception:
       return None
 
+
   def __get_ref_with_cell_name(self, cell):
     refs = []
     for i in re.findall(r"[A-Z]+[0-9]+", cell.exp):
       refs.append((i, self.cell(i)))
     return refs
 
+
   def print(self):
     for row in self.cells:
       print(list(map(lambda x: x.value, row)))
+
 
   def __ref_to_index(self, ref):
     if not re.match(r"^[A-Z]+[0-9]+$", ref):
@@ -118,6 +130,7 @@ class Sheet:
     if row_index >= self.height or column_index >= self.width:
       raise IndexError("Index out of bounds! It was {}".format(ref))
     return row_index, column_index
+
 
   @staticmethod
   def __column_name_to_index(column):

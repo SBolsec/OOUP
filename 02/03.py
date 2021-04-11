@@ -14,20 +14,22 @@ def mymax(iterable, key=lambda x: x):
 
 
 if __name__ == "__main__":
-  print(mymax([
+  strings = [
     "Gle", "malu", "vocku", "poslije", "kise",
-    "Puna", "je", "kapi", "pa", "ih", "njise"], lambda x: len(x)))
+    "Puna", "je", "kapi", "pa", "ih", "njise"
+  ]
+
+  longest_string = mymax(strings, lambda x: len(x))
+  print(longest_string)
 
   maxint = mymax([1, 3, 5, 7, 4, 6, 9, 2, 0])
   maxchar = mymax("Suncana strana ulice")
-  maxstring = mymax([
-  "Gle", "malu", "vocku", "poslije", "kise",
-  "Puna", "je", "kapi", "pa", "ih", "njise"])
+  maxstring = mymax(strings)
   print(maxint)
   print(maxchar)
   print(maxstring)
 
-  D={'burek':8, 'buthla':5}
+  D={'burek':8, 'buhtla':5}
   print(mymax(D, key=D.get))
 
   persons = [("pero", "peric"), ("juro", "juric"), ("pero", "horvat"), ("marko", "markovic")]
