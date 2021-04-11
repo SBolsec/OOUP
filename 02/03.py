@@ -31,6 +31,9 @@ if __name__ == "__main__":
 
   D={'burek':8, 'buhtla':5}
   print(mymax(D, key=D.get))
+  # Metodu D.get možemo koristiti kao slobodnu funkciju zato što su u pythonu funkcije
+  # ravnopravne objektima. Metoda D.get sadrži referencu na rječnik D te kada će se 
+  # pozvati biti će moguće preko te reference dohvatiti ispravnu vrijednost iz riječnika
 
   persons = [("pero", "peric"), ("juro", "juric"), ("pero", "horvat"), ("marko", "markovic")]
   print(mymax(persons))

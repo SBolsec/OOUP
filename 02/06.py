@@ -192,3 +192,11 @@ if __name__=="__main__":
   except RuntimeError as e:
     print("Caught exception:", e)
   s.print()
+
+
+# Korišten je obrzac promatrač. Razred Cell se istovremeno koristi
+# kao subjekt i kao promatrač. Kao subjekt radi u smislu da kada se 
+# ćeliji promijeni obaviještava ostale ćelije, koje se referenciraju 
+# na nju, o toj promjeni. Kao promatrač radi zato jer se pretplaćuje
+# na ćelije o kojima ovisi te kada od njih zaprimi obavijest da se
+# dogodila promjena pokreće ponovnu evaluaciju za sebe.
