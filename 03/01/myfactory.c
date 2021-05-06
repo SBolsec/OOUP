@@ -9,13 +9,7 @@ typedef void* (*FUNCREATE)(char const*);
 
 void *myfactory(char const *libname, char const *ctorarg)
 {
-  int count = 0;
-  while (1)
-  {
-    if (libname[count] == '\0')
-      break;
-    count++;
-  }
+  int count = strlen(libname);
   int size = 2 + count + 3 + 1;
   char *file = malloc(size);
   file[0] = '.';
