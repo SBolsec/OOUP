@@ -25,12 +25,14 @@ void *myfactory(char const *libname, char const *ctorarg)
 
   void *handle = dlopen(file, RTLD_LAZY);
   if (!handle)
-  {
     return NULL;
-  }
+  
   dlerror();    /* Clear any existing error */
 
   FUNCREATE create = (FUNCREATE) dlsym(handle, "create");
+
+  if (dlerror() != NULL)
+    return NULL;
 
   return create(ctorarg);
 }
