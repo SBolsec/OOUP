@@ -10,18 +10,10 @@ typedef void* (*FUNCREATE)(char const*);
 void *myfactory(char const *libname, char const *ctorarg)
 {
   int count = strlen(libname);
-  int size = 2 + count + 3 + 1;
-  char *file = malloc(size);
-  file[0] = '.';
-  file[1] = '/';
-  for (int i = 2; i < 2 + count; i++)
-  {
-    file[i] = libname[i-2];
-  }
-  file[size-4] = '.';
-  file[size-3] = 's';
-  file[size-2] = 'o';
-  file[size-1] = '\0';
+  char file[100] = {};
+  strcat(file, "./");
+  strncat(file, libname, count);
+  strcat(file, ".so");
 
   void *handle = dlopen(file, RTLD_LAZY);
   if (!handle)
