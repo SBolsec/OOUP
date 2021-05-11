@@ -32,7 +32,16 @@ public class TextEditorComponent extends JComponent implements CursorObserver, T
         Graphics2D g2d = (Graphics2D) g;
         FontMetrics fontMetrics = getFontMetrics(getFont());
 
-        LocationRange selectedText = model.getSelectionRange();
+        LocationRange selectedRange = model.getSelectionRange();
+        LocationRange selectedText = null; // sorting so the start is first for easier drawing
+        if (selectedRange != null) {
+            if (selectedRange.getStart().compareTo(selectedRange.getEnd()) == -1) {
+                selectedText = selectedRange;
+            } else if (selectedRange.getStart().compareTo(selectedRange.getEnd()) == 1) {
+                selectedText = new LocationRange(selectedRange.getEnd(), selectedRange.getStart());
+            }
+        }
+
         Location cursorLocation = model.getCursorLocation();
 
         Iterator<String> it = model.allLines();

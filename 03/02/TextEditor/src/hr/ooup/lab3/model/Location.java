@@ -2,7 +2,7 @@ package hr.ooup.lab3.model;
 
 import java.util.Objects;
 
-public class Location {
+public class Location implements Comparable<Location> {
     private int x;
     private int y;
 
@@ -38,5 +38,14 @@ public class Location {
     @Override
     public int hashCode() {
         return Objects.hash(x, y);
+    }
+
+    @Override
+    public int compareTo(Location o) {
+        if (this.y < o.y) return -1;
+        if (this.y == o.y) {
+            return Integer.compare(this.x, o.x);
+        }
+        return 1;
     }
 }

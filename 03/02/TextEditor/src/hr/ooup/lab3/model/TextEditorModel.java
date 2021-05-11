@@ -54,42 +54,43 @@ public class TextEditorModel {
     // CURSOR MANIPULATION
     public void moveCursorLeft() {
         if (cursorLocation.getX() - 1 >= 0) {
-            cursorLocation.setX(cursorLocation.getX() - 1);
+            cursorLocation = new Location(cursorLocation.getX() - 1, cursorLocation.getY());
             notifyCursorObservers();
-            return;
-        }
-        if (cursorLocation.getY() - 1 >= 0) {
-            cursorLocation.setX(lines.get(cursorLocation.getY() - 1).length());
-            cursorLocation.setY(cursorLocation.getY() - 1);
+        } else if (cursorLocation.getY() - 1 >= 0) {
+            cursorLocation = new Location(lines.get(cursorLocation.getY() - 1).length(), cursorLocation.getY() - 1);
             notifyCursorObservers();
         }
     }
 
     public void moveCursorRight() {
         if (cursorLocation.getX() + 1 <= lines.get(cursorLocation.getY()).length()) {
-            cursorLocation.setX(cursorLocation.getX() + 1);
+            cursorLocation = new Location(cursorLocation.getX() + 1, cursorLocation.getY());
             notifyCursorObservers();
-            return;
-        }
-        if (cursorLocation.getY() + 1 < lines.size()) {
-            cursorLocation.setX(0);
-            cursorLocation.setY(cursorLocation.getY() + 1);
+        } else if (cursorLocation.getY() + 1 < lines.size()) {
+            cursorLocation = new Location(0, cursorLocation.getY() + 1);
             notifyCursorObservers();
         }
     }
 
     public void moveCursorUp() {
         if (cursorLocation.getY() != 0) {
-            cursorLocation.setX(Math.min(cursorLocation.getX(), lines.get(cursorLocation.getY() - 1).length()));
-            cursorLocation.setY(cursorLocation.getY() - 1);
-            notifyCursorObservers();
+            int x = Math.min(cursorLocation.getX(), lines.get(cursorLocation.getY() - 1).length());
+            int y = cursorLocation.getY() - 1;
+            cursorLocation = new Location(x, y);
+        } else {
+            cursorLocation = new Location(0, 0);
         }
+        notifyCursorObservers();
     }
 
     public void moveCursorDown() {
         if (cursorLocation.getY() != lines.size() - 1) {
-            cursorLocation.setX(Math.min(cursorLocation.getX(), lines.get(cursorLocation.getY() + 1).length()));
-            cursorLocation.setY(cursorLocation.getY() + 1);
+            int x = Math.min(cursorLocation.getX(), lines.get(cursorLocation.getY() + 1).length());
+            int y = cursorLocation.getY() + 1;
+            cursorLocation = new Location(x, y);
+            notifyCursorObservers();
+        } else {
+            cursorLocation = new Location(lines.get(cursorLocation.getY()).length(), lines.size()-1);
             notifyCursorObservers();
         }
     }
@@ -150,12 +151,12 @@ public class TextEditorModel {
 
     public void deleteRange(LocationRange range) {
         if (range == null) return;
+        if (range.getStart().compareTo(range.getEnd()) == 1) {
+            range = new LocationRange(range.getEnd(), range.getStart());
+        }
         if (range.getStart().getY() != range.getEnd().getY()) {
-            lines.set(range.getStart().getY(), lines.get(range.getStart().getY()).substring(0, range.getStart().getX()));
-            lines.set(range.getEnd().getY(), lines.get(range.getEnd().getY()).substring(range.getEnd().getX()));
-            if (lines.get(range.getEnd().getY()).isBlank())
-                lines.remove(range.getEnd().getY());
-            for (int i = range.getStart().getY() + 1; i < range.getEnd().getY(); i++) {
+            lines.set(range.getStart().getY(), lines.get(range.getStart().getY()).substring(0, range.getStart().getX()) + lines.get(range.getEnd().getY()).substring(range.getEnd().getX()));
+            for (int i = range.getStart().getY() + 1; i <= range.getEnd().getY(); i++) {
                 lines.remove(range.getStart().getY()+1);
             }
             if (lines.get(range.getStart().getY()).isBlank())
@@ -175,6 +176,7 @@ public class TextEditorModel {
 
     public void setSelectionRange(LocationRange range) {
         selectionRange = range;
+        notifyTextObservers();
     }
 
     public void insert(char c) {
@@ -211,140 +213,5 @@ public class TextEditorModel {
         }
         notifyCursorObservers();
         notifyTextObservers();
-    }
-
-    // MANIPULATING THE SELECTION RANGE
-    public void addSelectionUp() {
-        if (cursorLocation.getY() == 0) return;
-
-        Location end = null;
-        if (selectionRange == null) {
-            end = new Location(cursorLocation.getX(), cursorLocation.getY());
-        }
-
-        Location newLocation = new Location(Math.min(cursorLocation.getX(), lines.get(cursorLocation.getY()-1).length()), cursorLocation.getY()-1);
-
-        if (end == null) {
-            if (selectionRange.getStart().getY() < newLocation.getY()) {
-                selectionRange.setEnd(newLocation);
-            } else if (selectionRange.getStart().getY() > newLocation.getY()) {
-                selectionRange.setStart(newLocation);
-            } else {
-                if (selectionRange.getStart().getX() < newLocation.getX()) {
-                    selectionRange.setEnd(newLocation);
-                } else if (selectionRange.getStart().getX() > newLocation.getX()) {
-                    selectionRange.setStart(newLocation);
-                } else {
-                    selectionRange = null;
-                }
-            }
-        } else {
-            selectionRange = new LocationRange(newLocation, end);
-        }
-        cursorLocation = newLocation;
-        notifyCursorObservers();
-    }
-
-    public void addSelectionDown() {
-        if (cursorLocation.getY() == lines.size()-1) return;
-
-        Location start = null;
-        if (selectionRange == null) {
-            start = new Location(cursorLocation.getX(), cursorLocation.getY());
-        }
-
-        Location newLocation = new Location(Math.min(cursorLocation.getX(), lines.get(cursorLocation.getY()+1).length()), cursorLocation.getY()+1);
-
-        if (start == null) {
-            if (selectionRange.getEnd().getY() > newLocation.getY()) {
-                selectionRange.setStart(newLocation);
-            } else if (selectionRange.getEnd().getY() < newLocation.getY()) {
-                selectionRange.setEnd(newLocation);
-            } else {
-                if (selectionRange.getEnd().getX() < newLocation.getX()) {
-                    selectionRange.setEnd(newLocation);
-                } else if (selectionRange.getEnd().getX() > newLocation.getX()) {
-                    selectionRange.setStart(newLocation);
-                } else {
-                    selectionRange = null;
-                }
-            }
-        } else {
-            selectionRange = new LocationRange(start, newLocation);
-        }
-        cursorLocation = newLocation;
-        notifyCursorObservers();
-    }
-
-    public void addSelectionLeft() {
-        Location end = null;
-        if (selectionRange == null) {
-            end = new Location(cursorLocation.getX(), cursorLocation.getY());
-        }
-
-        Location newLocation = null;
-        if (cursorLocation.getX() - 1 >= 0) {
-            newLocation = new Location(cursorLocation.getX() - 1, cursorLocation.getY());
-        } else if (cursorLocation.getY() - 1 >= 0) {
-            newLocation = new Location(lines.get(cursorLocation.getY() - 1).length(), cursorLocation.getY() - 1);
-        } else {
-            return;
-        }
-
-        if (end == null) {
-            if (selectionRange.getStart().getY() < newLocation.getY()) {
-                selectionRange.setEnd(newLocation);
-            } else if (selectionRange.getStart().getY() > newLocation.getY()) {
-                selectionRange.setStart(newLocation);
-            } else {
-                if (selectionRange.getStart().getX() < newLocation.getX()) {
-                    selectionRange.setEnd(newLocation);
-                } else if (selectionRange.getStart().getX() > newLocation.getX()) {
-                    selectionRange.setStart(newLocation);
-                } else {
-                    selectionRange = null;
-                }
-            }
-        } else {
-            selectionRange = new LocationRange(newLocation, end);
-        }
-        cursorLocation = newLocation;
-        notifyCursorObservers();
-    }
-
-    public void addSelectionRight() {
-        Location start = null;
-        if (selectionRange == null) {
-            start = new Location(cursorLocation.getX(), cursorLocation.getY());
-        }
-
-        Location newLocation = null;
-        if (cursorLocation.getX() + 1 <= lines.get(cursorLocation.getY()).length()) {
-            newLocation = new Location(cursorLocation.getX() + 1, cursorLocation.getY());
-        } else if (cursorLocation.getY() + 1 < lines.size()) {
-            newLocation = new Location(0, cursorLocation.getY() + 1);
-        } else {
-            return;
-        }
-
-        if (start == null) {
-            if (selectionRange.getEnd().getY() > newLocation.getY()) {
-                selectionRange.setStart(newLocation);
-            } else if (selectionRange.getEnd().getY() < newLocation.getY()) {
-                selectionRange.setEnd(newLocation);
-            } else {
-                if (selectionRange.getEnd().getX() < newLocation.getX()) {
-                    selectionRange.setEnd(newLocation);
-                } else if (selectionRange.getEnd().getX() > newLocation.getX()) {
-                    selectionRange.setStart(newLocation);
-                } else {
-                    selectionRange = null;
-                }
-            }
-        } else {
-            selectionRange = new LocationRange(start, newLocation);
-        }
-        cursorLocation = newLocation;
-        notifyCursorObservers();
     }
 }

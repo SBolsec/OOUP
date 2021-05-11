@@ -1,5 +1,7 @@
 package hr.ooup.lab3;
 
+import hr.ooup.lab3.model.Location;
+import hr.ooup.lab3.model.LocationRange;
 import hr.ooup.lab3.model.TextEditorModel;
 
 import javax.swing.*;
@@ -41,28 +43,48 @@ public class TextEditor extends JFrame {
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_UP -> {
-                        if (e.isShiftDown()) model.addSelectionUp();
+                        if (e.isShiftDown()) {
+                            Location cursor = model.getCursorLocation();
+                            model.moveCursorUp();
+                            if (model.getSelectionRange() == null) model.setSelectionRange(new LocationRange(cursor, model.getCursorLocation()));
+                            else model.setSelectionRange(new LocationRange(model.getSelectionRange().getStart(), model.getCursorLocation()));
+                        }
                         else {
                             model.setSelectionRange(null);
                             model.moveCursorUp();
                         }
                     }
                     case KeyEvent.VK_DOWN -> {
-                        if (e.isShiftDown()) model.addSelectionDown();
+                        if (e.isShiftDown()) {
+                            Location cursor = model.getCursorLocation();
+                            model.moveCursorDown();
+                            if (model.getSelectionRange() == null) model.setSelectionRange(new LocationRange(cursor, model.getCursorLocation()));
+                            else model.setSelectionRange(new LocationRange(model.getSelectionRange().getStart(), model.getCursorLocation()));
+                        }
                         else {
                             model.setSelectionRange(null);
                             model.moveCursorDown();
                         }
                     }
                     case KeyEvent.VK_LEFT -> {
-                        if (e.isShiftDown()) model.addSelectionLeft();
+                        if (e.isShiftDown()) {
+                            Location cursor = model.getCursorLocation();
+                            model.moveCursorLeft();
+                            if (model.getSelectionRange() == null) model.setSelectionRange(new LocationRange(cursor, model.getCursorLocation()));
+                            else model.setSelectionRange(new LocationRange(model.getSelectionRange().getStart(), model.getCursorLocation()));
+                        }
                         else {
                             model.setSelectionRange(null);
                             model.moveCursorLeft();
                         }
                     }
                     case KeyEvent.VK_RIGHT -> {
-                        if (e.isShiftDown()) model.addSelectionRight();
+                        if (e.isShiftDown()) {
+                            Location cursor = model.getCursorLocation();
+                            model.moveCursorRight();
+                            if (model.getSelectionRange() == null) model.setSelectionRange(new LocationRange(cursor, model.getCursorLocation()));
+                            else model.setSelectionRange(new LocationRange(model.getSelectionRange().getStart(), model.getCursorLocation()));
+                        }
                         else {
                             model.setSelectionRange(null);
                             model.moveCursorRight();
@@ -77,10 +99,10 @@ public class TextEditor extends JFrame {
                         else model.deleteRange(model.getSelectionRange());
                     }
                     default -> {
-                        if (model.getSelectionRange() != null)
-                            model.deleteRange(model.getSelectionRange());
                         if(!e.isActionKey() && !e.isMetaDown() && e.getKeyCode() != KeyEvent.VK_SHIFT && e.getKeyCode() != KeyEvent.VK_ALT
                                 && e.getKeyCode() != KeyEvent.VK_ALT_GRAPH && !e.isControlDown() && e.getKeyCode() != KeyEvent.VK_ESCAPE) {
+                            if (model.getSelectionRange() != null)
+                                model.deleteRange(model.getSelectionRange());
                             model.insert(e.getKeyChar());
                         }
                     }
