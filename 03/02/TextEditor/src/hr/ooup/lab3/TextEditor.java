@@ -1,5 +1,6 @@
 package hr.ooup.lab3;
 
+import hr.ooup.lab3.clipboard.CliboardStack;
 import hr.ooup.lab3.model.Location;
 import hr.ooup.lab3.model.LocationRange;
 import hr.ooup.lab3.model.TextEditorModel;
@@ -8,14 +9,17 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Iterator;
 
 public class TextEditor extends JFrame {
 
     private TextEditorModel model;
     private TextEditorComponent editorComponent;
+    private CliboardStack clipboard;
 
     public TextEditor() {
         model = new TextEditorModel("Neki tekst\nProba\nNeki tekst");
+        clipboard = new CliboardStack();
 
         initGUI();
     }
@@ -99,6 +103,36 @@ public class TextEditor extends JFrame {
                         else model.deleteRange(model.getSelectionRange());
                     }
                     default -> {
+                        if (e.isControlDown() && e.getKeyCode() != KeyEvent.VK_CONTROL) {
+                            if (e.isShiftDown() && e.getKeyCode() != KeyEvent.VK_SHIFT) {
+                                if (e.getKeyCode() == KeyEvent.VK_V) {
+                                    if (!clipboard.isEmpty())
+                                        model.insert(clipboard.pop());
+                                }
+                                return;
+                            }
+                            switch (e.getKeyCode()) {
+                                case KeyEvent.VK_C -> {
+                                    String selectedText = getSelectedText();
+                                    if (selectedText != null) {
+                                        clipboard.push(selectedText);
+                                    }
+                                }
+                                case KeyEvent.VK_X -> {
+                                    String selectedText = getSelectedText();
+                                    if (selectedText != null) {
+                                        clipboard.push(selectedText);
+                                        model.deleteRange(model.getSelectionRange());
+                                    }
+                                }
+                                case KeyEvent.VK_V -> {
+                                    if (!clipboard.isEmpty())
+                                        model.insert(clipboard.peek());
+                                }
+                            }
+                            return;
+                        }
+
                         if(!e.isActionKey() && !e.isMetaDown() && e.getKeyCode() != KeyEvent.VK_SHIFT && e.getKeyCode() != KeyEvent.VK_ALT
                                 && e.getKeyCode() != KeyEvent.VK_ALT_GRAPH && !e.isControlDown() && e.getKeyCode() != KeyEvent.VK_ESCAPE) {
                             if (model.getSelectionRange() != null)
@@ -109,6 +143,37 @@ public class TextEditor extends JFrame {
                 }
             }
         });
+    }
+
+    private String getSelectedText() {
+        LocationRange selectionRange = model.getSelectionRange();
+        if (selectionRange != null) {
+            if (selectionRange.getStart().compareTo(selectionRange.getEnd()) == 1) {
+                selectionRange = new LocationRange(selectionRange.getEnd(), selectionRange.getStart());
+            }
+            StringBuilder sb = new StringBuilder();
+            Iterator<String> it = model.linesRange(selectionRange.getStart().getY(), selectionRange.getEnd().getY()+1);
+            for (int i = selectionRange.getStart().getY(); it.hasNext(); i++) {
+                String line = it.next();
+                if (i == selectionRange.getStart().getY()) {
+                    if (i == selectionRange.getEnd().getY()) {
+                        sb.append(line.substring(selectionRange.getStart().getX(), selectionRange.getEnd().getX()));
+                    } else {
+                        sb.append(line.substring(selectionRange.getStart().getX()));
+                    }
+                } else if (i == selectionRange.getEnd().getY()) {
+                    sb.append(line.substring(0, selectionRange.getEnd().getX()));
+                } else {
+                    sb.append(line);
+                }
+                if (selectionRange.getStart().getY() != selectionRange.getEnd().getY() && i != selectionRange.getEnd().getY()) {
+                    sb.append("\n");
+                }
+            }
+            return sb.toString();
+        } else {
+            return null;
+        }
     }
 
     public static void main(String[] args) {

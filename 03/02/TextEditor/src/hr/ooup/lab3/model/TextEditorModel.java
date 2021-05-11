@@ -180,6 +180,12 @@ public class TextEditorModel {
     }
 
     public void insert(char c) {
+        if (lines.size() == 0) {
+            lines.add(Character.toString(c));
+            notifyCursorObservers();
+            notifyTextObservers();
+            return;
+        }
         String line = lines.get(cursorLocation.getY());
         if (c == 10) { // new line
             lines.set(cursorLocation.getY(), line.substring(0, cursorLocation.getX()));

@@ -26,6 +26,7 @@ public class ListRangeIterator<T> implements Iterator<T> {
     @Override
     public T next() {
         if (!hasNext()) throw new NoSuchElementException();
+        leftToTake--;
         return original.next();
     }
 }
