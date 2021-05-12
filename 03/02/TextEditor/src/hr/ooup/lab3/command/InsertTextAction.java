@@ -3,7 +3,6 @@ package hr.ooup.lab3.command;
 import hr.ooup.lab3.model.Location;
 import hr.ooup.lab3.model.TextEditorModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class InsertTextAction implements EditAction {
@@ -67,16 +66,6 @@ public class InsertTextAction implements EditAction {
                 }
                 lines.remove(cursorLocation.getY()+1);
             }
-
-//            String lastLine = lines.get(model.getCursorLocation().getY());
-//            lines.set(cursorLocation.getY(), line.substring(0, cursorLocation.getX()) +
-//                    lastLine.substring(Math.min(model.getCursorLocation().getX(), lastLine.length())));
-//            for (int i = cursorLocation.getY(); i < model.getCursorLocation().getY(); i++) {
-//                lines.remove(cursorLocation.getY()+1);
-//            }
-//            if (lines.get(cursorLocation.getY()).length() == cursorLocation.getX()) {
-//                lines.remove(cursorLocation.getY()+1);
-//            }
         }
         model.setCursorLocation(cursorLocation);
         model.notifyCursorObservers();
