@@ -26,6 +26,8 @@ public class InsertTextAction implements EditAction {
                 lines.add(s);
             }
             model.setLines(lines);
+            model.notifyCursorObservers();
+            model.notifyTextObservers();
             return;
         }
 
@@ -43,6 +45,8 @@ public class InsertTextAction implements EditAction {
             lines.set(cursorLocation.getY(), line.substring(0, cursorLocation.getX()) + text + line.substring(cursorLocation.getX()));
             model.setCursorLocation(new Location(cursorLocation.getX() + text.length(), cursorLocation.getY()));
         }
+        model.notifyCursorObservers();
+        model.notifyTextObservers();
     }
 
     @Override

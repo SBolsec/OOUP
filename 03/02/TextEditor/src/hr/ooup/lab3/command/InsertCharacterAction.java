@@ -34,6 +34,8 @@ public class InsertCharacterAction implements EditAction {
             lines.set(cursorLocation.getY(), newLine);
             model.setCursorLocation(new Location(cursorLocation.getX()+1, cursorLocation.getY()));
         }
+        model.notifyCursorObservers();
+        model.notifyTextObservers();
     }
 
     @Override

@@ -1,9 +1,6 @@
 package hr.ooup.lab3.model;
 
-import hr.ooup.lab3.command.EditAction;
-import hr.ooup.lab3.command.InsertCharacterAction;
-import hr.ooup.lab3.command.InsertTextAction;
-import hr.ooup.lab3.command.UndoManager;
+import hr.ooup.lab3.command.*;
 import hr.ooup.lab3.iterator.ListIterator;
 import hr.ooup.lab3.iterator.ListRangeIterator;
 import hr.ooup.lab3.observer.CursorObserver;
@@ -154,19 +151,9 @@ public class TextEditorModel {
     }
 
     public void deleteAfter() {
-        if (cursorLocation.getX() == lines.get(cursorLocation.getY()).length() && cursorLocation.getY() == lines.size()-1) return;
-        if (cursorLocation.getX() == lines.get(cursorLocation.getY()).length()) {
-            lines.set(cursorLocation.getY(), lines.get(cursorLocation.getY()) + lines.get(cursorLocation.getY()+1));
-            lines.remove(cursorLocation.getY()+1);
-            notifyTextObservers();
-            return;
-        }
-
-        String line = lines.get(cursorLocation.getY());
-        String newLine = line.substring(0, cursorLocation.getX()) + line.substring(cursorLocation.getX()+1);
-        lines.set(cursorLocation.getY(), newLine);
-
-        notifyTextObservers();
+        EditAction action = new DeleteAfterAction(this);
+        action.executeDo();
+        undoManager.push(action);
     }
 
     public void deleteRange(LocationRange range) {
@@ -207,17 +194,11 @@ public class TextEditorModel {
         EditAction action = new InsertCharacterAction(this, c);
         action.executeDo();
         undoManager.push(action);
-
-        notifyCursorObservers();
-        notifyTextObservers();
     }
 
     public void insert(String text) {
         EditAction action = new InsertTextAction(this, text);
         action.executeDo();
         undoManager.push(action);
-
-        notifyCursorObservers();
-        notifyTextObservers();
     }
 }
