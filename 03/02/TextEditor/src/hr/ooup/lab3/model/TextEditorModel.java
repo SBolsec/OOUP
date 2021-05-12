@@ -141,24 +141,9 @@ public class TextEditorModel {
     }
 
     public void deleteRange(LocationRange range) {
-        if (range == null) return;
-        if (range.getStart().compareTo(range.getEnd()) == 1) {
-            range = new LocationRange(range.getEnd(), range.getStart());
-        }
-        if (range.getStart().getY() != range.getEnd().getY()) {
-            lines.set(range.getStart().getY(), lines.get(range.getStart().getY()).substring(0, range.getStart().getX()) + lines.get(range.getEnd().getY()).substring(range.getEnd().getX()));
-            for (int i = range.getStart().getY() + 1; i <= range.getEnd().getY(); i++) {
-                lines.remove(range.getStart().getY()+1);
-            }
-            if (lines.get(range.getStart().getY()).isBlank())
-                lines.remove(range.getStart().getY());
-        } else {
-            lines.set(range.getStart().getY(), lines.get(range.getStart().getY()).substring(0, range.getStart().getX()) + lines.get(range.getStart().getY()).substring(range.getEnd().getX()));
-        }
-
-        cursorLocation = range.getStart();
-        selectionRange = null;
-        notifyTextObservers();
+        EditAction action = new DeleteRangeAction(this, range);
+        action.executeDo();
+        undoManager.push(action);
     }
 
     public LocationRange getSelectionRange() {
