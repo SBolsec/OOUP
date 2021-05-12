@@ -28,9 +28,9 @@ public class TextEditorComponent extends JComponent implements CursorObserver, T
 
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+        g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         Graphics2D g2d = (Graphics2D) g;
-        FontMetrics fontMetrics = getFontMetrics(getFont());
+        FontMetrics fontMetrics = getFontMetrics(g.getFont());
 
         LocationRange selectedRange = model.getSelectionRange();
         LocationRange selectedText = null; // sorting so the start is first for easier drawing
@@ -149,11 +149,13 @@ public class TextEditorComponent extends JComponent implements CursorObserver, T
     public void updateCursorLocation(Location loc) {
         revalidate();
         repaint();
+        requestFocusInWindow();
     }
 
     @Override
     public void updateText() {
         revalidate();
         repaint();
+        requestFocusInWindow();
     }
 }

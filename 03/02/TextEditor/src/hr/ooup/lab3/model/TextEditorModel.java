@@ -1,5 +1,6 @@
 package hr.ooup.lab3.model;
 
+import hr.ooup.lab3.command.UndoManager;
 import hr.ooup.lab3.iterator.ListIterator;
 import hr.ooup.lab3.iterator.ListRangeIterator;
 import hr.ooup.lab3.observer.CursorObserver;
@@ -10,13 +11,28 @@ import java.util.*;
 public class TextEditorModel {
     private List<String> lines;
     private LocationRange selectionRange;
-    private Location cursorLocation = new Location(0,0);
-
+    private Location cursorLocation;
     private List<CursorObserver> cursorObservers = new ArrayList<>();
     private List<TextObserver> textObservers = new ArrayList<>();
+    private UndoManager undoManager = UndoManager.getInstance();
 
     public TextEditorModel(String startingText) {
         lines = new ArrayList<>(Arrays.asList(startingText.split("\n")));
+        selectionRange = null;
+        cursorLocation = new Location(0,0);
+        notifyCursorObservers();
+        notifyTextObservers();
+    }
+
+    public List<String> getLines() {
+        return lines;
+    }
+
+    public void setLines(List<String> lines) {
+        this.lines = lines;
+        this.cursorLocation = new Location(0,0);
+        notifyTextObservers();
+        notifyCursorObservers();
     }
 
     public Location getCursorLocation() {
@@ -25,6 +41,7 @@ public class TextEditorModel {
 
     public void setCursorLocation(Location cursorLocation) {
         this.cursorLocation = cursorLocation;
+        notifyCursorObservers();
     }
 
     // ITERATORS
@@ -175,8 +192,12 @@ public class TextEditorModel {
     }
 
     public void setSelectionRange(LocationRange range) {
-        selectionRange = range;
-        notifyTextObservers();
+        if (range != null && range.getStart().equals(range.getEnd())) {
+            selectionRange = null;
+        } else {
+            selectionRange = range;
+        }
+        notifyCursorObservers();
     }
 
     public void insert(char c) {
