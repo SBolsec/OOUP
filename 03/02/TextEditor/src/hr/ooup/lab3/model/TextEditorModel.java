@@ -1,5 +1,8 @@
 package hr.ooup.lab3.model;
 
+import hr.ooup.lab3.command.EditAction;
+import hr.ooup.lab3.command.InsertCharacterAction;
+import hr.ooup.lab3.command.InsertTextAction;
 import hr.ooup.lab3.command.UndoManager;
 import hr.ooup.lab3.iterator.ListIterator;
 import hr.ooup.lab3.iterator.ListRangeIterator;
@@ -62,7 +65,7 @@ public class TextEditorModel {
         cursorObservers.remove(observer);
     }
 
-    private void notifyCursorObservers() {
+    public void notifyCursorObservers() {
         for (CursorObserver o : cursorObservers) {
             o.updateCursorLocation(cursorLocation);
         }
@@ -121,7 +124,7 @@ public class TextEditorModel {
         textObservers.remove(observer);
     }
 
-    private void notifyTextObservers() {
+    public void notifyTextObservers() {
         for (TextObserver o : textObservers) {
             o.updateText();
         }
@@ -201,43 +204,19 @@ public class TextEditorModel {
     }
 
     public void insert(char c) {
-        if (lines.size() == 0) {
-            lines.add(Character.toString(c));
-            notifyCursorObservers();
-            notifyTextObservers();
-            return;
-        }
-        String line = lines.get(cursorLocation.getY());
-        if (c == 10) { // new line
-            lines.set(cursorLocation.getY(), line.substring(0, cursorLocation.getX()));
-            lines.add(cursorLocation.getY()+1, line.substring(cursorLocation.getX()));
-            cursorLocation.setX(0);
-            cursorLocation.setY(cursorLocation.getY()+1);
-        } else {
-            String newLine = line.substring(0, cursorLocation.getX()) + c + line.substring(cursorLocation.getX());
-            lines.set(cursorLocation.getY(), newLine);
-            cursorLocation.setX(cursorLocation.getX()+1);
-        }
+        EditAction action = new InsertCharacterAction(this, c);
+        action.executeDo();
+        undoManager.push(action);
+
         notifyCursorObservers();
         notifyTextObservers();
     }
 
     public void insert(String text) {
-        String line = lines.get(cursorLocation.getY());
-        if (text.contains("\n")) {
-            String[] toAdd = text.split("\n");
-            lines.set(cursorLocation.getY(), line.substring(0, cursorLocation.getX()) + toAdd[0]);
-            int i;
-            for (i = 1; i < toAdd.length - 1; i++) {
-                lines.add(cursorLocation.getY() + i, toAdd[i]);
-            }
-            lines.add(cursorLocation.getY() + i, toAdd[i] + line.substring(cursorLocation.getX()));
-            cursorLocation.setX(toAdd[i].length());
-            cursorLocation.setY(cursorLocation.getY()+i);
-        } else {
-            lines.set(cursorLocation.getY(), line.substring(0, cursorLocation.getX()) + text + line.substring(cursorLocation.getX()));
-            cursorLocation.setX(cursorLocation.getX() + text.length());
-        }
+        EditAction action = new InsertTextAction(this, text);
+        action.executeDo();
+        undoManager.push(action);
+
         notifyCursorObservers();
         notifyTextObservers();
     }

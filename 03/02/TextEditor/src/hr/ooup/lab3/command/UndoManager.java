@@ -31,6 +31,9 @@ public class UndoManager {
         EditAction action = undoStack.pop();
         redoStack.push(action);
         action.executeUndo();
+
+        notifyUndoStackObservers();
+        notifyRedoStackObservers();
     }
 
     public void redo() {
@@ -38,11 +41,17 @@ public class UndoManager {
         EditAction action = redoStack.pop();
         undoStack.push(action);
         action.executeDo();
+
+        notifyUndoStackObservers();
+        notifyRedoStackObservers();
     }
 
     public void push(EditAction c) {
         redoStack.clear();
         undoStack.push(c);
+
+        notifyUndoStackObservers();
+        notifyRedoStackObservers();
     }
 
     public void attachUndoStackObserver(StackObserver observer) {
@@ -54,7 +63,7 @@ public class UndoManager {
     }
 
     private void notifyUndoStackObservers() {
-        if (redoStack.isEmpty()) {
+        if (undoStack.isEmpty()) {
             for (StackObserver o : undoStackObservers)
                 o.empty();
         } else {
@@ -80,6 +89,4 @@ public class UndoManager {
                 o.hasElements();
         }
     }
-
-
 }

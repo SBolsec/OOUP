@@ -5,9 +5,7 @@ import hr.ooup.lab3.command.UndoManager;
 import hr.ooup.lab3.model.Location;
 import hr.ooup.lab3.model.LocationRange;
 import hr.ooup.lab3.model.TextEditorModel;
-import hr.ooup.lab3.observer.CursorObserver;
 import hr.ooup.lab3.observer.StackObserver;
-import hr.ooup.lab3.observer.TextObserver;
 
 import javax.swing.*;
 import java.awt.*;
@@ -127,36 +125,6 @@ public class TextEditor extends JFrame {
                         else model.deleteRange(model.getSelectionRange());
                     }
                     default -> {
-                        if (e.isControlDown() && e.getKeyCode() != KeyEvent.VK_CONTROL) {
-                            if (e.isShiftDown() && e.getKeyCode() != KeyEvent.VK_SHIFT) {
-                                if (e.getKeyCode() == KeyEvent.VK_V) {
-                                    if (!clipboard.isEmpty())
-                                        model.insert(clipboard.pop());
-                                }
-                                return;
-                            }
-                            switch (e.getKeyCode()) {
-                                case KeyEvent.VK_C -> {
-                                    String selectedText = getSelectedText();
-                                    if (selectedText != null) {
-                                        clipboard.push(selectedText);
-                                    }
-                                }
-                                case KeyEvent.VK_X -> {
-                                    String selectedText = getSelectedText();
-                                    if (selectedText != null) {
-                                        clipboard.push(selectedText);
-                                        model.deleteRange(model.getSelectionRange());
-                                    }
-                                }
-                                case KeyEvent.VK_V -> {
-                                    if (!clipboard.isEmpty())
-                                        model.insert(clipboard.peek());
-                                }
-                            }
-                            return;
-                        }
-
                         if(!e.isActionKey() && !e.isMetaDown() && e.getKeyCode() != KeyEvent.VK_SHIFT && e.getKeyCode() != KeyEvent.VK_ALT
                                 && e.getKeyCode() != KeyEvent.VK_ALT_GRAPH && !e.isControlDown() && e.getKeyCode() != KeyEvent.VK_ESCAPE) {
                             if (model.getSelectionRange() != null)
@@ -312,49 +280,50 @@ public class TextEditor extends JFrame {
     private Action undoAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            undoManager.undo();
         }
     };
 
     private Action redoAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            undoManager.redo();
         }
     };
 
     private Action cutAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            clipboard.push(getSelectedText());
+            model.deleteRange(model.getSelectionRange());
         }
     };
 
     private Action copyAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            clipboard.push(getSelectedText());
         }
     };
 
     private Action pasteAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            model.insert(clipboard.peek());
         }
     };
 
     private Action pasteAndTakeAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            model.insert(clipboard.pop());
         }
     };
 
     private Action deleteSelectionAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            model.deleteRange(model.getSelectionRange());
         }
     };
 
