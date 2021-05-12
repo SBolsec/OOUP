@@ -129,25 +129,9 @@ public class TextEditorModel {
 
     // TEXT MANIPULATIONS
     public void deleteBefore() {
-        if (cursorLocation.getY() == 0 && cursorLocation.getX() == 0) return;
-        if (cursorLocation.getX() == 0) {
-            cursorLocation.setX(lines.get(cursorLocation.getY()-1).length());
-            lines.set(cursorLocation.getY()-1, lines.get(cursorLocation.getY()-1) + lines.get(cursorLocation.getY()));
-            lines.remove(cursorLocation.getY());
-            cursorLocation.setY(cursorLocation.getY()-1);
-
-            notifyTextObservers();
-            notifyCursorObservers();
-            return;
-        }
-
-        String line = lines.get(cursorLocation.getY());
-        String newLine = line.substring(0, cursorLocation.getX()-1) + line.substring(cursorLocation.getX());
-        lines.set(cursorLocation.getY(), newLine);
-        cursorLocation.setX(cursorLocation.getX()-1);
-
-        notifyTextObservers();
-        notifyCursorObservers();
+        EditAction action = new DeleteBeforeAction(this);
+        action.executeDo();
+        undoManager.push(action);
     }
 
     public void deleteAfter() {
