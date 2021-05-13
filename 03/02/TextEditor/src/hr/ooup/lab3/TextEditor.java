@@ -6,6 +6,8 @@ import hr.ooup.lab3.model.Location;
 import hr.ooup.lab3.model.LocationRange;
 import hr.ooup.lab3.model.TextEditorModel;
 import hr.ooup.lab3.observer.StackObserver;
+import hr.ooup.lab3.plugins.Plugin;
+import hr.ooup.lab3.plugins.PluginFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class TextEditor extends JFrame {
@@ -444,6 +447,24 @@ public class TextEditor extends JFrame {
 
         moveMenu.add(new JMenuItem(cursorToDocumentStartAction));
         moveMenu.add(new JMenuItem(cursorToDocumentEndAction));
+
+        List<Plugin> plugins = PluginFactory.getAllPlugins();
+        if (!plugins.isEmpty()) {
+            JMenu pluginsMenu = new JMenu("Plugins");
+            menuBar.add(pluginsMenu);
+
+            for (Plugin plugin : plugins) {
+                Action action = new AbstractAction() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        plugin.execute(model, undoManager, clipboard);
+                    }
+                };
+                action.putValue(Action.NAME, plugin.getName());
+                action.putValue(Action.SHORT_DESCRIPTION, plugin.getDescription());
+                pluginsMenu.add(action);
+            }
+        }
 
         this.setJMenuBar(menuBar);
     }
