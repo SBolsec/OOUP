@@ -5,7 +5,9 @@ import hr.ooup.lab3.command.UndoManager;
 import hr.ooup.lab3.model.Location;
 import hr.ooup.lab3.model.LocationRange;
 import hr.ooup.lab3.model.TextEditorModel;
+import hr.ooup.lab3.observer.CursorObserver;
 import hr.ooup.lab3.observer.StackObserver;
+import hr.ooup.lab3.observer.TextObserver;
 import hr.ooup.lab3.plugins.Plugin;
 import hr.ooup.lab3.plugins.PluginFactory;
 
@@ -30,9 +32,7 @@ public class TextEditor extends JFrame {
     private TextEditorComponent editorComponent;
     private CliboardStack clipboard;
     private UndoManager undoManager;
-    private JPanel statusBar;
-    private JLabel statusCursor;
-    private JLabel statusLines;
+    private StatusBar statusBar;
 
     public TextEditor() {
         model = new TextEditorModel("Neki tekst\nProba\nNeki tekst");
@@ -483,19 +483,8 @@ public class TextEditor extends JFrame {
     }
 
     private void initStatusBar() {
-        statusBar = new JPanel(new GridLayout(1, 2));
+        statusBar = new StatusBar();
         statusBar.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-        Location cursor = model.getCursorLocation();
-        statusCursor = new JLabel("Ln " + (cursor.getY()+1) + ", Col " + (cursor.getX()+1));
-        Iterator<String> it = model.allLines();
-        int i;
-        for (i = 0; it.hasNext(); i++) {
-            it.next();
-        }
-        statusLines = new JLabel("Lines in document: " + i);
-
-        statusBar.add(statusCursor);
-        statusBar.add(statusLines);
         add(statusBar, BorderLayout.PAGE_END);
     }
 
@@ -511,8 +500,6 @@ public class TextEditor extends JFrame {
         });
 
         model.attachCursorObserver((location) -> {
-            statusCursor.setText("Ln " + (location.getY()+1) + ", Col " + (location.getX()+1));
-
             if (model.getSelectionRange() == null) {
                 cutAction.setEnabled(false);
                 copyAction.setEnabled(false);
@@ -530,7 +517,6 @@ public class TextEditor extends JFrame {
             for (i = 0; it.hasNext(); i++) {
                 it.next();
             }
-            statusLines.setText("Lines in document: " + i);
         });
 
         undoManager.attachUndoStackObserver(new StackObserver() {
@@ -556,6 +542,47 @@ public class TextEditor extends JFrame {
                 redoAction.setEnabled(true);
             }
         });
+    }
+
+    private class StatusBar extends JLabel implements TextObserver, CursorObserver {
+        private Location cursor;
+        private int numOfLines;
+
+        public StatusBar() {
+            cursor = model.getCursorLocation();
+            Iterator<String> it = model.allLines();
+            int i;
+            for (i = 0; it.hasNext(); i++) {
+                it.next();
+            }
+            numOfLines = i;
+            updateStatus();
+
+            model.attachTextObserver(this);
+            model.attachCursorObserver(this);
+        }
+
+        @Override
+        public void updateCursorLocation(Location loc) {
+            cursor = loc;
+            updateStatus();
+        }
+
+        @Override
+        public void updateText() {
+            Iterator<String> it = model.allLines();
+            int i;
+            for (i = 0; it.hasNext(); i++) {
+                it.next();
+            }
+            numOfLines = i;
+            updateStatus();
+        }
+
+        private void updateStatus() {
+            this.setText("Ln " + (cursor.getY()+1) + ", Col " + (cursor.getX()+1)
+                    + "    Lines in document: " +numOfLines);
+        }
     }
 
     public static void main(String[] args) {
