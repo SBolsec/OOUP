@@ -52,7 +52,7 @@ public class TextEditorComponent extends JComponent implements CursorObserver, T
 
             // draw the highlight on the selected text
             if (selectedText != null && index >= selectedText.getStart().getY() && index <= selectedText.getEnd().getY()) {
-                g2d.setColor(Color.YELLOW);
+                g2d.setColor(Color.LIGHT_GRAY);
                 if (index == selectedText.getStart().getY()) {
                     int charsToSkip = selectedText.getStart().getX();
                     int offset = x0;

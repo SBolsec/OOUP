@@ -83,6 +83,7 @@ public class DeleteRangeAction implements EditAction {
         }
 
         model.setCursorLocation(cursor);
+        model.setSelectionRange(range);
 
         model.notifyTextObservers();
         model.notifyCursorObservers();
