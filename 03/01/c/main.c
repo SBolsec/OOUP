@@ -41,4 +41,14 @@ int main(int argc, char *argv[])
     animalPrintMenu(p);
     free(p);
   }
+
+  printf("\n=== STACK ===\n");
+  for (int i = 1; i < argc; i++) {
+    int size = objectsize(argv[i]);
+    char object[size];
+    myfactorystack(object, argv[i], "Modrobradi");
+    struct Animal *animal = (struct Animal *) object;
+    animalPrintGreeting(animal);
+    animalPrintMenu(animal);
+  }
 }

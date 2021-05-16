@@ -26,10 +26,21 @@ PTRFUN tiger_vtable[] = {
   (PTRFUN) menu
 };
 
+void construct(void *object, char const *name)
+{
+  struct Tiger *tiger = (struct Tiger *) object;
+  tiger->name = name;
+  tiger->vtable = tiger_vtable;
+}
+
 void* create(char const* name) 
 {
-  struct Tiger* p = (struct Tiger*) malloc(sizeof(struct Tiger));
-  p->name = name;
-  p->vtable = tiger_vtable;
-  return p;
+  struct Tiger* t = (struct Tiger*) malloc(sizeof(struct Tiger));
+  construct(t, name);
+  return t;
+}
+
+int size()
+{
+  return sizeof(struct Tiger);
 }

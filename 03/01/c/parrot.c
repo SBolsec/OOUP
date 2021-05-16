@@ -26,10 +26,21 @@ PTRFUN parrot_vtable[3] = {
   (PTRFUN) menu
 };
 
+void construct(void *object, char const* name)
+{
+  struct Parrot *parrot = (struct Parrot *) object;
+  parrot->name = name;
+  parrot->vtable = parrot_vtable;
+}
+
 void *create(char const* name) 
 {
   struct Parrot* p = (struct Parrot*) malloc(sizeof(struct Parrot));
-  p->name = name;
-  p->vtable = parrot_vtable;
+  construct(p, name);
   return p;
+}
+
+int size()
+{
+  return sizeof(struct Parrot);
 }
