@@ -2,6 +2,7 @@ package hr.fer.ooup.lab4;
 
 import hr.fer.ooup.lab4.geometry.Point;
 import hr.fer.ooup.lab4.listeners.DocumentModelListener;
+import hr.fer.ooup.lab4.model.CompositeShape;
 import hr.fer.ooup.lab4.model.GraphicalObject;
 import hr.fer.ooup.lab4.model.LineSegment;
 import hr.fer.ooup.lab4.model.Oval;
@@ -15,7 +16,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 import java.util.List;
 
 public class GUI extends JFrame {
@@ -26,11 +29,12 @@ public class GUI extends JFrame {
     private DocumentModel documentModel;
     private Canvas canvas;
     private State currentState;
-
+    private Map<String, GraphicalObject> prototypes;
 
     public GUI(List<GraphicalObject> objects) {
         this.objects = objects;
         this.documentModel = new DocumentModel();
+        this.prototypes = new HashMap<>();
         this.currentState = IDLE_STATE;
 
         initGUI();
@@ -50,11 +54,20 @@ public class GUI extends JFrame {
         canvas = new Canvas(documentModel);
         add(canvas, BorderLayout.CENTER);
 
+        // add prototypes
+        for (GraphicalObject go : objects) {
+            prototypes.put(go.getShapeID(), go);
+        }
+        GraphicalObject composite = new CompositeShape();
+        prototypes.put(composite.getShapeID(), composite);
     }
 
     private void addToolbar() {
         JToolBar toolBar = new JToolBar();
         toolBar.setFloatable(true);
+
+        loadAction.putValue(Action.NAME, "Učitaj");
+        toolBar.add(loadAction);
 
         saveAction.putValue(Action.NAME, "Pohrani");
         toolBar.add(saveAction);
@@ -193,6 +206,37 @@ public class GUI extends JFrame {
                 JOptionPane.showMessageDialog(
                         GUI.this,
                         "Pohrana neuspješna!",
+                        "ERROR",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    };
+
+    private Action loadAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JFileChooser fc = new JFileChooser();
+            fc.setDialogTitle("Učitaj");
+            if (fc.showSaveDialog(GUI.this) != JFileChooser.APPROVE_OPTION) return;
+            String filePath = fc.getSelectedFile().getPath();
+
+            try {
+                List<String> lines = Files.readAllLines(Path.of(filePath));
+                Stack<GraphicalObject> stack = new Stack<>();
+                for (String line : lines) {
+                    if (line.isBlank()) continue;
+                    if (!line.startsWith("@")) continue;
+                    int separator = line.indexOf(" ");
+                    GraphicalObject go = prototypes.get(line.substring(0, separator));
+                    go.load(stack, line.substring(separator+1));
+                }
+                for (GraphicalObject go : stack) {
+                    documentModel.addGraphicalObject(go);
+                }
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(
+                        GUI.this,
+                        "Učitavanje neuspješno!",
                         "ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }

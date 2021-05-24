@@ -6,6 +6,7 @@ import hr.fer.ooup.lab4.listeners.GraphicalObjectListener;
 import hr.fer.ooup.lab4.renderer.Renderer;
 
 import java.util.List;
+import java.util.Stack;
 
 public interface GraphicalObject {
 
@@ -37,6 +38,6 @@ public interface GraphicalObject {
 
     // Podrška za snimanje i učitavanje
     String getShapeID();
-//    void load(Stack<GraphicalObject> stack, String data);
+    void load(Stack<GraphicalObject> stack, String data);
     void save(List<String> rows);
 }

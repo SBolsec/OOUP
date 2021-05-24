@@ -6,6 +6,7 @@ import hr.fer.ooup.lab4.renderer.Renderer;
 import hr.fer.ooup.lab4.util.GeometryUtil;
 
 import java.util.List;
+import java.util.Stack;
 
 public class Oval extends AbstractGraphicalObject {
 
@@ -114,6 +115,15 @@ public class Oval extends AbstractGraphicalObject {
     @Override
     public String getShapeID() {
         return "@OVAL";
+    }
+
+    @Override
+    public void load(Stack<GraphicalObject> stack, String data) {
+        String[] p = data.trim().split("\s+");
+        stack.push(new Oval(
+                new Point(Integer.parseInt(p[2]), Integer.parseInt(p[3])),
+                new Point(Integer.parseInt(p[0]), Integer.parseInt(p[1]))
+        ));
     }
 
     @Override

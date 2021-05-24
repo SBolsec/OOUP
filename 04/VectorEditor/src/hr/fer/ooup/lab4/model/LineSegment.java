@@ -6,6 +6,7 @@ import hr.fer.ooup.lab4.renderer.Renderer;
 import hr.fer.ooup.lab4.util.GeometryUtil;
 
 import java.util.List;
+import java.util.Stack;
 
 public class LineSegment extends AbstractGraphicalObject {
 
@@ -60,6 +61,15 @@ public class LineSegment extends AbstractGraphicalObject {
     @Override
     public String getShapeID() {
         return "@LINE";
+    }
+
+    @Override
+    public void load(Stack<GraphicalObject> stack, String data) {
+        String[] p = data.trim().split("\s+");
+        stack.push(new LineSegment(
+                new Point(Integer.parseInt(p[0]), Integer.parseInt(p[1])),
+                new Point(Integer.parseInt(p[2]), Integer.parseInt(p[3]))
+        ));
     }
 
     @Override

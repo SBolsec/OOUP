@@ -8,6 +8,7 @@ import hr.fer.ooup.lab4.renderer.Renderer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Stack;
 
 public class CompositeShape implements GraphicalObject {
 
@@ -21,34 +22,10 @@ public class CompositeShape implements GraphicalObject {
         this.listeners = new ArrayList<>();
     }
 
-    public CompositeShape(List<GraphicalObject> children) {
-        this.children = children;
-        this.listeners = new ArrayList<>();
-        this.selected = false;
-        for (GraphicalObject go : children) {
-            if (go.isSelected()) {
-                this.selected = true;
-                break;
-            }
-        }
-    }
-
     public CompositeShape(boolean selected, List<GraphicalObject> children) {
         this.selected = selected;
         this.children = children;
         this.listeners = new ArrayList<>();
-    }
-
-    public void addChild(GraphicalObject go) {
-        children.add(go);
-        notifyListeners();
-        notifySelectionListeners();
-    }
-
-    public void removeChild(GraphicalObject go) {
-        children.remove(go);
-        notifyListeners();
-        notifySelectionListeners();
     }
 
     public List<GraphicalObject> getChildren() {
@@ -175,6 +152,16 @@ public class CompositeShape implements GraphicalObject {
     @Override
     public String getShapeID() {
         return "@COMP";
+    }
+
+    @Override
+    public void load(Stack<GraphicalObject> stack, String data) {
+        Integer n = Integer.parseInt(data.trim());
+        List<GraphicalObject> objects = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            objects.add(stack.pop());
+        }
+        stack.push(new CompositeShape(false, objects));
     }
 
     @Override
