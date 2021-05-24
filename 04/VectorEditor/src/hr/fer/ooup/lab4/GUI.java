@@ -6,23 +6,29 @@ import hr.fer.ooup.lab4.model.LineSegment;
 import hr.fer.ooup.lab4.model.Oval;
 import hr.fer.ooup.lab4.renderer.G2DRendererImpl;
 import hr.fer.ooup.lab4.renderer.Renderer;
+import hr.fer.ooup.lab4.state.IdleState;
+import hr.fer.ooup.lab4.state.State;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GUI extends JFrame {
 
+    private static final State IDLE_STATE = new IdleState();
+
     private List<GraphicalObject> objects;
     private DocumentModel documentModel;
     private Canvas canvas;
+    private State currentState;
 
 
     public GUI(List<GraphicalObject> objects) {
         this.objects = objects;
         this.documentModel = new DocumentModel();
+        this.currentState = IDLE_STATE;
 
         initGUI();
     }
@@ -33,7 +39,8 @@ public class GUI extends JFrame {
         setTitle("VectorEditor");
 
         addComponents();
-        addTolbar();
+        addToolbar();
+        addListeners();
     }
 
     private void addComponents() {
@@ -42,7 +49,7 @@ public class GUI extends JFrame {
 
     }
 
-    private void addTolbar() {
+    private void addToolbar() {
         JToolBar toolBar = new JToolBar();
         toolBar.setFloatable(true);
 
@@ -53,6 +60,39 @@ public class GUI extends JFrame {
         }
 
         add(toolBar, BorderLayout.PAGE_START);
+    }
+
+    private void addListeners() {
+        canvas.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    currentState.onLeaving();
+                    currentState = IDLE_STATE;
+                } else {
+                    currentState.keyPressed(e.getKeyCode());
+                }
+            }
+        });
+
+        canvas.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                currentState.mouseDown(new Point(e.getX(), e.getY()), e.isShiftDown(), e.isAltDown());
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                currentState.mouseUp(new Point(e.getX(), e.getY()), e.isShiftDown(), e.isAltDown());
+            }
+        });
+
+        canvas.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                currentState.mouseDragged(new Point(e.getX(), e.getY()));
+            }
+        });
     }
 
     private class Canvas extends JComponent {
@@ -71,7 +111,9 @@ public class GUI extends JFrame {
             Renderer r = new G2DRendererImpl(g2d);
             for (GraphicalObject go : this.documentModel.list()) {
                 go.render(r);
+                currentState.afterDraw(r, go);
             }
+            currentState.afterDraw(r);
             requestFocusInWindow();
         }
     }
