@@ -7,11 +7,13 @@ import hr.fer.ooup.lab4.model.LineSegment;
 import hr.fer.ooup.lab4.model.Oval;
 import hr.fer.ooup.lab4.renderer.G2DRendererImpl;
 import hr.fer.ooup.lab4.renderer.Renderer;
+import hr.fer.ooup.lab4.renderer.SVGRendererImpl;
 import hr.fer.ooup.lab4.state.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +54,9 @@ public class GUI extends JFrame {
     private void addToolbar() {
         JToolBar toolBar = new JToolBar();
         toolBar.setFloatable(true);
+
+        svgExportAction.putValue(Action.NAME, "SVG export");
+        toolBar.add(svgExportAction);
 
         for (GraphicalObject go : objects) {
             Action action = new CanvasAction(go);
@@ -121,6 +126,38 @@ public class GUI extends JFrame {
         public void actionPerformed(ActionEvent e) {
             currentState.onLeaving();
             currentState = new EraserState(documentModel);
+        }
+    };
+
+    private Action svgExportAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JFileChooser fc = new JFileChooser();
+            fc.setDialogTitle("SVG export");
+            if (fc.showSaveDialog(GUI.this) != JFileChooser.APPROVE_OPTION) return;
+            String filePath = fc.getSelectedFile().getPath();
+            if (!filePath.endsWith(".svg")) {
+                filePath += ".svg";
+            }
+
+            SVGRendererImpl r = new SVGRendererImpl(filePath);
+            for (GraphicalObject go : documentModel.list()) {
+                go.render(r);
+            }
+            try {
+                r.close();
+                JOptionPane.showMessageDialog(
+                        GUI.this,
+                        "Export uspješan!",
+                        "INFO",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } catch (IOException ioException) {
+                JOptionPane.showMessageDialog(
+                        GUI.this,
+                        "Export neuspješan!",
+                        "ERROR",
+                        JOptionPane.ERROR_MESSAGE);
+            }
         }
     };
 
