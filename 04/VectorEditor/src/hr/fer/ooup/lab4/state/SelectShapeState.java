@@ -43,7 +43,8 @@ public class SelectShapeState extends IdleState {
 
     @Override
     public void mouseDragged(Point mousePoint) {
-        indexOfSelectedHotPoint = model.findSelectedHotPoint(selectedObject, mousePoint);
+        if (selectedObject != null)
+            indexOfSelectedHotPoint = model.findSelectedHotPoint(selectedObject, mousePoint);
         if (indexOfSelectedHotPoint == -1) return;
 
         selectedObject.setHotPointSelected(indexOfSelectedHotPoint, true);
