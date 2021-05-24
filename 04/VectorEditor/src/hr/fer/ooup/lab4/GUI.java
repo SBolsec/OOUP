@@ -1,11 +1,13 @@
 package hr.fer.ooup.lab4;
 
 import hr.fer.ooup.lab4.geometry.Point;
+import hr.fer.ooup.lab4.listeners.DocumentModelListener;
 import hr.fer.ooup.lab4.model.GraphicalObject;
 import hr.fer.ooup.lab4.model.LineSegment;
 import hr.fer.ooup.lab4.model.Oval;
 import hr.fer.ooup.lab4.renderer.G2DRendererImpl;
 import hr.fer.ooup.lab4.renderer.Renderer;
+import hr.fer.ooup.lab4.state.AddShapeState;
 import hr.fer.ooup.lab4.state.IdleState;
 import hr.fer.ooup.lab4.state.State;
 
@@ -63,10 +65,17 @@ public class GUI extends JFrame {
     }
 
     private void addListeners() {
+        documentModel.addDocumentModelListener(new DocumentModelListener() {
+            @Override
+            public void documentChange() {
+                canvas.repaint();
+            }
+        });
+
         canvas.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE || e.getKeyChar() == KeyEvent.VK_ESCAPE) {
                     currentState.onLeaving();
                     currentState = IDLE_STATE;
                 } else {
@@ -128,7 +137,7 @@ public class GUI extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            currentState = new AddShapeState(documentModel, go);
         }
     }
 

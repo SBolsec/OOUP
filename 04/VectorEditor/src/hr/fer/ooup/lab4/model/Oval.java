@@ -93,12 +93,23 @@ public class Oval extends AbstractGraphicalObject {
 
     @Override
     public GraphicalObject duplicate() {
-        Point a = getHotPoint(0);
-        Point b = getHotPoint(1);
+        Point down = getHotPoint(0);
+        Point right = getHotPoint(1);
 
         return new Oval(
-                new Point(a.getX(), a.getY()),
-                new Point(b.getX(), b.getY())
+                new Point(down.getX(), down.getY()),
+                new Point(right.getX(), right.getY())
         );
+    }
+
+    @Override
+    public void translate(Point delta) {
+        Point down = getHotPoint(0).translate(delta);
+        Point right = getHotPoint(1).translate(delta);
+
+        setHotPoint(0, down);
+        setHotPoint(1, right);
+
+        center = new Point(down.getX(), right.getY());
     }
 }
