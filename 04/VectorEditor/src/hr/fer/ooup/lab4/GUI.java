@@ -9,6 +9,7 @@ import hr.fer.ooup.lab4.renderer.G2DRendererImpl;
 import hr.fer.ooup.lab4.renderer.Renderer;
 import hr.fer.ooup.lab4.state.AddShapeState;
 import hr.fer.ooup.lab4.state.IdleState;
+import hr.fer.ooup.lab4.state.SelectShapeState;
 import hr.fer.ooup.lab4.state.State;
 
 import javax.swing.*;
@@ -61,6 +62,9 @@ public class GUI extends JFrame {
             toolBar.add(action);
         }
 
+        selectShapeAction.putValue(Action.NAME, "Selektiraj");
+        toolBar.add(selectShapeAction);
+
         add(toolBar, BorderLayout.PAGE_START);
     }
 
@@ -74,8 +78,8 @@ public class GUI extends JFrame {
 
         canvas.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyTyped(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ESCAPE || e.getKeyChar() == KeyEvent.VK_ESCAPE) {
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     currentState.onLeaving();
                     currentState = IDLE_STATE;
                 } else {
@@ -87,12 +91,12 @@ public class GUI extends JFrame {
         canvas.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                currentState.mouseDown(new Point(e.getX(), e.getY()), e.isShiftDown(), e.isAltDown());
+                currentState.mouseDown(new Point(e.getX(), e.getY()), e.isShiftDown(), e.isControlDown());
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                currentState.mouseUp(new Point(e.getX(), e.getY()), e.isShiftDown(), e.isAltDown());
+                currentState.mouseUp(new Point(e.getX(), e.getY()), e.isShiftDown(), e.isControlDown());
             }
         });
 
@@ -102,6 +106,29 @@ public class GUI extends JFrame {
                 currentState.mouseDragged(new Point(e.getX(), e.getY()));
             }
         });
+    }
+
+    private Action selectShapeAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            currentState.onLeaving();
+            currentState = new SelectShapeState(documentModel);
+        }
+    };
+
+    private class CanvasAction extends AbstractAction {
+
+        private GraphicalObject go;
+
+        public CanvasAction(GraphicalObject go) {
+            this.go = go;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            currentState.onLeaving();
+            currentState = new AddShapeState(documentModel, go);
+        }
     }
 
     private class Canvas extends JComponent {
@@ -124,20 +151,6 @@ public class GUI extends JFrame {
             }
             currentState.afterDraw(r);
             requestFocusInWindow();
-        }
-    }
-
-    private class CanvasAction extends AbstractAction {
-
-        private GraphicalObject go;
-
-        public CanvasAction(GraphicalObject go) {
-            this.go = go;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            currentState = new AddShapeState(documentModel, go);
         }
     }
 

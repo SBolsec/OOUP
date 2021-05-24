@@ -157,4 +157,10 @@ public class DocumentModel {
         }
         return -1;
     }
+
+    public void deselectAll() {
+        while (selectedObjects.size() > 0) {
+            selectedObjects.get(0).setSelected(false);
+        }
+    }
 }

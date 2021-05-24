@@ -9,20 +9,15 @@ public class Oval extends AbstractGraphicalObject {
 
     private static final int NUMBER_OF_POINTS = 180;
 
-    private Point center;
-
     public Oval() {
         super(new Point[]{
                 new Point(0,10),
                 new Point(10,0)
         });
-        center = new Point(5,5);
     }
 
     public Oval(Point downHotPoint, Point rightHotPoint) {
-        super(new Point[]{rightHotPoint, downHotPoint});
-
-        center = new Point(downHotPoint.getX(), rightHotPoint.getY());
+        super(new Point[]{downHotPoint, rightHotPoint});
     }
 
     @Override
@@ -30,11 +25,23 @@ public class Oval extends AbstractGraphicalObject {
         Point down = getHotPoint(0);
         Point right = getHotPoint(1);
 
-        int x = down.getX() - (right.getX() - down.getX());
-        int y = right.getY() - (down.getY() - right.getY());
+        int x, y, width, height;
 
-        int width = 2 * (right.getX() - down.getX());
-        int height = 2 * (down.getY() - right.getY());
+        if (down.getX() <= right.getX()) {
+            x = down.getX() - (right.getX() - down.getX());
+            width = 2 * (right.getX() - down.getX());
+        } else {
+            x = right.getX();
+            width = 2 * (down.getX() - right.getX());
+        }
+
+        if (right.getY() <= down.getY()) {
+            y = right.getY() - (down.getY() - right.getY());
+            height = 2 * (down.getY() - right.getY());
+        } else {
+            y = down.getY();
+            height = 2 * (right.getY() - down.getY());
+        }
 
         return new Rectangle(x, y, width, height);
     }
@@ -44,8 +51,8 @@ public class Oval extends AbstractGraphicalObject {
         Point down = getHotPoint(0);
         Point right = getHotPoint(1);
 
-        int a = right.getX() - down.getX();
-        int b = down.getY() - right.getY();
+        int a = Math.abs(right.getX() - down.getX());
+        int b = Math.abs(down.getY() - right.getY());
         int p = down.getX();
         int q = right.getY();
 
@@ -73,14 +80,14 @@ public class Oval extends AbstractGraphicalObject {
         Point down = getHotPoint(0);
         Point right = getHotPoint(1);
 
-        int a = right.getX() - down.getX();
-        int b = down.getY() - right.getY();
+        int a = Math.abs(right.getX() - down.getX());
+        int b = Math.abs(down.getY() - right.getY());
 
         Point[] points = new Point[n];
         for (int i = 0; i < n; i++) {
             double t = (2 * Math.PI / n) * i;
-            int x = (int)(a * Math.cos(t)) + center.getX();
-            int y = (int)(b * Math.sin(t)) + center.getY();
+            int x = (int)(a * Math.cos(t)) + down.getX();
+            int y = (int)(b * Math.sin(t)) + right.getY();
             points[i] = new Point(x, y);
         }
         return points;
@@ -109,7 +116,5 @@ public class Oval extends AbstractGraphicalObject {
 
         setHotPoint(0, down);
         setHotPoint(1, right);
-
-        center = new Point(down.getX(), right.getY());
     }
 }
