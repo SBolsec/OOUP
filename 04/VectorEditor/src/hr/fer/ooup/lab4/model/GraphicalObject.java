@@ -5,6 +5,8 @@ import hr.fer.ooup.lab4.geometry.Rectangle;
 import hr.fer.ooup.lab4.listeners.GraphicalObjectListener;
 import hr.fer.ooup.lab4.renderer.Renderer;
 
+import java.util.List;
+
 public interface GraphicalObject {
 
     // Podrška za uređivanje objekta
@@ -34,7 +36,7 @@ public interface GraphicalObject {
     GraphicalObject duplicate();
 
     // Podrška za snimanje i učitavanje
-//    String getShapeID();
+    String getShapeID();
 //    void load(Stack<GraphicalObject> stack, String data);
-//    void save(List<String> rows);
+    void save(List<String> rows);
 }

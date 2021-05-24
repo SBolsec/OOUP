@@ -5,6 +5,8 @@ import hr.fer.ooup.lab4.geometry.Rectangle;
 import hr.fer.ooup.lab4.renderer.Renderer;
 import hr.fer.ooup.lab4.util.GeometryUtil;
 
+import java.util.List;
+
 public class LineSegment extends AbstractGraphicalObject {
 
     public LineSegment() {
@@ -53,5 +55,17 @@ public class LineSegment extends AbstractGraphicalObject {
                 new Point(a.getX(), a.getY()),
                 new Point(b.getX(), b.getY())
         );
+    }
+
+    @Override
+    public String getShapeID() {
+        return "@LINE";
+    }
+
+    @Override
+    public void save(List<String> rows) {
+        Point a = getHotPoint(0);
+        Point b = getHotPoint(1);
+        rows.add(getShapeID()+" "+a.getX()+" "+a.getY()+" "+b.getX()+" "+b.getY());
     }
 }

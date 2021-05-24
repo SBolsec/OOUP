@@ -172,6 +172,19 @@ public class CompositeShape implements GraphicalObject {
         return new CompositeShape(selected, newChildren);
     }
 
+    @Override
+    public String getShapeID() {
+        return "@COMP";
+    }
+
+    @Override
+    public void save(List<String> rows) {
+        for (GraphicalObject go : children) {
+            go.save(rows);
+        }
+        rows.add(getShapeID() + " " + children.size());
+    }
+
     protected void notifyListeners() {
         for (GraphicalObjectListener l : listeners) {
             l.graphicalObjectChanged(this);

@@ -5,6 +5,8 @@ import hr.fer.ooup.lab4.geometry.Rectangle;
 import hr.fer.ooup.lab4.renderer.Renderer;
 import hr.fer.ooup.lab4.util.GeometryUtil;
 
+import java.util.List;
+
 public class Oval extends AbstractGraphicalObject {
 
     private static final int NUMBER_OF_POINTS = 180;
@@ -107,6 +109,18 @@ public class Oval extends AbstractGraphicalObject {
                 new Point(down.getX(), down.getY()),
                 new Point(right.getX(), right.getY())
         );
+    }
+
+    @Override
+    public String getShapeID() {
+        return "@OVAL";
+    }
+
+    @Override
+    public void save(List<String> rows) {
+        Point down = getHotPoint(0);
+        Point right = getHotPoint(1);
+        rows.add(getShapeID()+" "+right.getX()+" "+right.getY()+" "+down.getX()+" "+down.getY());
     }
 
     @Override

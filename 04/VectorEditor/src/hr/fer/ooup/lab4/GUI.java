@@ -13,6 +13,7 @@ import hr.fer.ooup.lab4.state.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +55,9 @@ public class GUI extends JFrame {
     private void addToolbar() {
         JToolBar toolBar = new JToolBar();
         toolBar.setFloatable(true);
+
+        saveAction.putValue(Action.NAME, "Pohrani");
+        toolBar.add(saveAction);
 
         svgExportAction.putValue(Action.NAME, "SVG export");
         toolBar.add(svgExportAction);
@@ -155,6 +159,40 @@ public class GUI extends JFrame {
                 JOptionPane.showMessageDialog(
                         GUI.this,
                         "Export neuspješan!",
+                        "ERROR",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    };
+
+    private Action saveAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JFileChooser fc = new JFileChooser();
+            fc.setDialogTitle("Pohrani");
+            if (fc.showSaveDialog(GUI.this) != JFileChooser.APPROVE_OPTION) return;
+            String filePath = fc.getSelectedFile().getPath();
+
+            List<String> rows = new ArrayList<>();
+            for (GraphicalObject go : documentModel.list()) {
+                go.save(rows);
+            }
+            try {
+                FileWriter fw = new FileWriter(filePath);
+                for (String row : rows) {
+                    fw.write(row+"\n");
+                }
+                fw.flush();
+                fw.close();
+                JOptionPane.showMessageDialog(
+                        GUI.this,
+                        "Pohrana uspješna!",
+                        "INFO",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(
+                        GUI.this,
+                        "Pohrana neuspješna!",
                         "ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
