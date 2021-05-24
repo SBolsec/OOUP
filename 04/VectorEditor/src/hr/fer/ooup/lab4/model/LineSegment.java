@@ -2,6 +2,7 @@ package hr.fer.ooup.lab4.model;
 
 import hr.fer.ooup.lab4.geometry.Point;
 import hr.fer.ooup.lab4.geometry.Rectangle;
+import hr.fer.ooup.lab4.renderer.Renderer;
 import hr.fer.ooup.lab4.util.GeometryUtil;
 
 public class LineSegment extends AbstractGraphicalObject {
@@ -31,6 +32,11 @@ public class LineSegment extends AbstractGraphicalObject {
     @Override
     public double selectionDistance(Point mousePoint) {
         return GeometryUtil.distanceFromLineSegment(getHotPoint(0), getHotPoint(1), mousePoint);
+    }
+
+    @Override
+    public void render(Renderer r) {
+        r.drawLine(getHotPoint(0), getHotPoint(1));
     }
 
     @Override

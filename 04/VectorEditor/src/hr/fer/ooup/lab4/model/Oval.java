@@ -2,6 +2,7 @@ package hr.fer.ooup.lab4.model;
 
 import hr.fer.ooup.lab4.geometry.Point;
 import hr.fer.ooup.lab4.geometry.Rectangle;
+import hr.fer.ooup.lab4.renderer.Renderer;
 import hr.fer.ooup.lab4.util.GeometryUtil;
 
 public class Oval extends AbstractGraphicalObject {
@@ -61,6 +62,11 @@ public class Oval extends AbstractGraphicalObject {
                 min = distance;
         }
         return min;
+    }
+
+    @Override
+    public void render(Renderer r) {
+        r.fillPolygon(getPoints(NUMBER_OF_POINTS));
     }
 
     private Point[] getPoints(int n) {

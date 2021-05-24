@@ -3,6 +3,7 @@ package hr.fer.ooup.lab4.model;
 import hr.fer.ooup.lab4.geometry.Point;
 import hr.fer.ooup.lab4.geometry.Rectangle;
 import hr.fer.ooup.lab4.listeners.GraphicalObjectListener;
+import hr.fer.ooup.lab4.renderer.Renderer;
 
 public interface GraphicalObject {
 
@@ -22,7 +23,7 @@ public interface GraphicalObject {
     double selectionDistance(Point mousePoint);
 
     // Podrška za crtanje (dio mosta)
-//    void render(Renderer r);
+    void render(Renderer r);
 
     // Observer za dojavu promjena modelu
     void addGraphicalObjectListener(GraphicalObjectListener l);
