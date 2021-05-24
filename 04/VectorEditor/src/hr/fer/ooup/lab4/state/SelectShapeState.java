@@ -3,10 +3,12 @@ package hr.fer.ooup.lab4.state;
 import hr.fer.ooup.lab4.DocumentModel;
 import hr.fer.ooup.lab4.geometry.Point;
 import hr.fer.ooup.lab4.geometry.Rectangle;
+import hr.fer.ooup.lab4.model.CompositeShape;
 import hr.fer.ooup.lab4.model.GraphicalObject;
 import hr.fer.ooup.lab4.renderer.Renderer;
 
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SelectShapeState extends IdleState {
@@ -29,7 +31,7 @@ public class SelectShapeState extends IdleState {
 
         if (ctrlDown) {
             if (go == null) return;
-            go.setSelected(true);
+            go.setSelected(!go.isSelected());
             selectedObject = null;
         } else {
             model.deselectAll();
@@ -91,6 +93,28 @@ public class SelectShapeState extends IdleState {
             case KeyEvent.VK_MINUS:
                 for (GraphicalObject go : selectedObjects) {
                     model.decreaseZ(go);
+                }
+                break;
+            case KeyEvent.VK_G:
+                List<GraphicalObject> children = new ArrayList<>(selectedObjects);
+                GraphicalObject composite = new CompositeShape(true, children);
+                while (!model.getSelectedObjects().isEmpty()) {
+                    model.removeGraphicalObject(model.getSelectedObjects().get(0));
+                }
+                composite.setSelected(true);
+                selectedObject = composite;
+                model.addGraphicalObject(composite);
+                break;
+            case KeyEvent.VK_U:
+                if (selectedObject != null && selectedObject instanceof CompositeShape) {
+                    CompositeShape compositeShape = (CompositeShape) selectedObject;
+                    List<GraphicalObject> objects = new ArrayList<>(compositeShape.getChildren());
+                    selectedObject = null;
+                    model.removeGraphicalObject(compositeShape);
+                    for (GraphicalObject go : objects) {
+                        go.setSelected(true);
+                        model.addGraphicalObject(go);
+                    }
                 }
                 break;
         }
