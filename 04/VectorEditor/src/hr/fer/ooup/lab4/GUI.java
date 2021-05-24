@@ -7,10 +7,7 @@ import hr.fer.ooup.lab4.model.LineSegment;
 import hr.fer.ooup.lab4.model.Oval;
 import hr.fer.ooup.lab4.renderer.G2DRendererImpl;
 import hr.fer.ooup.lab4.renderer.Renderer;
-import hr.fer.ooup.lab4.state.AddShapeState;
-import hr.fer.ooup.lab4.state.IdleState;
-import hr.fer.ooup.lab4.state.SelectShapeState;
-import hr.fer.ooup.lab4.state.State;
+import hr.fer.ooup.lab4.state.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -65,6 +62,9 @@ public class GUI extends JFrame {
         selectShapeAction.putValue(Action.NAME, "Selektiraj");
         toolBar.add(selectShapeAction);
 
+        eraserAction.putValue(Action.NAME, "Brisalo");
+        toolBar.add(eraserAction);
+
         add(toolBar, BorderLayout.PAGE_START);
     }
 
@@ -113,6 +113,14 @@ public class GUI extends JFrame {
         public void actionPerformed(ActionEvent e) {
             currentState.onLeaving();
             currentState = new SelectShapeState(documentModel);
+        }
+    };
+
+    private Action eraserAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            currentState.onLeaving();
+            currentState = new EraserState(documentModel);
         }
     };
 
