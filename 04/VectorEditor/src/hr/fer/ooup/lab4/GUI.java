@@ -230,6 +230,7 @@ public class GUI extends JFrame {
                     GraphicalObject go = prototypes.get(line.substring(0, separator));
                     go.load(stack, line.substring(separator+1));
                 }
+                documentModel.clear();
                 for (GraphicalObject go : stack) {
                     documentModel.addGraphicalObject(go);
                 }
